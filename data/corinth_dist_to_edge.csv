@@ -1,4 +1,4 @@
-Unit,Plot,Location,Species,tree_number,distance_to_edge_m,ID,
+unit,plot,location,species,tree_number,distance_to_edge_m,id,
 14,7,center,ACRU,20,13.5,1,
 14,7,center,ACRU,18,16.1,2,
 14,7,edge ,ACRU,12,9.2,4,
