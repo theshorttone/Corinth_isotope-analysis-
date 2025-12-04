@@ -12,11 +12,12 @@ library(tidyverse)
 leaf_data_filepath <- "data/corinth_leaf_2024.csv"
 soil_data_filepath <- "data/corinth_soil_2024.csv"
 dist_to_edge_filepath <- "data/corinth_dist_to_edge.csv"
-
+soil_redo_filepath <- "data/corinth_soil_redo.csv"
 
 df_leaf <- read_csv(leaf_data_filepath)
 df_soil <- read_csv(soil_data_filepath)
 def_key <- read_csv(dist_to_edge_filepath)
+df_soil_redo <- read_csv(soil_redo_filepath)
 
 
 # data wrangling ----------------------------------------------------------
@@ -36,6 +37,25 @@ df_leaf_clean <- df_leaf %>%
   separate(sample_id, into = c("tree_number", "unit_plot", "location", "species"), sep = " ") %>%
   separate(unit_plot, into = c("unit", "plot"), sep = "_") %>% 
   select(-location)
+
+df_soil_redo_clean <- df_soil_redo %>% 
+  rename(
+    g_id_number = `Sample ID`,
+    soil_lab_id = `OurLabID`,
+    soil_sample_weight = `Amount (mg)`,
+    soil_percent_c = `%C`,
+    soil_percent_n = `%N`,
+    soil_d13c = d13C,
+    soil_d15n = d15N
+  ) %>% 
+  filter(!str_detect(g_id_number, "tw")) %>% 
+    mutate(
+      id_number = str_remove(g_id_number, "^[0-9]+G_"),
+      id_clean = str_remove(id_number, "_.*$")) %>% 
+  relocate(id_clean, .after = 1) 
+  
+  
+  
 
 df_soil_clean <- df_soil %>% 
   select(-((ncol(.)-7):ncol(.))) %>% 
@@ -65,10 +85,12 @@ df_soil_clean <- df_soil %>%
           -soil_comments)
   
 
+#####ADD NEW SOIL STUFF########### before average step 
 
 # average soil duplicates -------------------------------------------------
 
 df_soil_clean_no_dup <- df_soil_clean %>%
+  bind_rows (df_soil_redo_clean) %>% 
   group_by(id_clean) %>%                          # group duplicates together
   summarize(
     across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),   # average numeric columns
@@ -92,18 +114,44 @@ norm_keys <- function(df) {
 key_df  <- norm_keys(def_key)
 df_leaf_m <- norm_keys(df_leaf_clean)
 
-df_c <- df_leaf_m %>%
+
+
+df_c_raw <- df_leaf_m %>%
   full_join(
     key_df,
     by = dplyr::join_by(unit, plot, species, tree_number)
-  ) %>% 
-  group_by(id) %>%                          # group duplicates together
-  summarize(
-    across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),   # average numeric columns
-    across(where(is.character), ~ str_c(unique(.x), collapse = " and ")),  # concat strings
-    .groups = "drop"
   )
+
+df_c <- bind_rows(
+  # ---- 1. Summarize ONLY rows that have an ID ----
+  df_c_raw %>%
+    filter(!is.na(id)) %>%
+    group_by(id) %>%
+    summarize(
+      across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),
+      across(where(is.character), ~ str_c(unique(.x), collapse = " and ")),
+      .groups = "drop"
+    ),
   
+  # ---- 2. Add back all rows with NA ID unchanged ----
+  df_c_raw %>% 
+    filter(is.na(id))
+)
+
+
+# 
+# df_c <- df_leaf_m %>%
+#   full_join(
+#     key_df,
+#     by = dplyr::join_by(unit, plot, species, tree_number)
+#   ) %>% 
+#   group_by(id) %>%                          # group duplicates together
+#   summarize(
+#     across(where(is.numeric), ~ mean(.x, na.rm = TRUE)),   # average numeric columns
+#     across(where(is.character), ~ str_c(unique(.x), collapse = " and ")),  # concat strings
+#     .groups = "drop"
+#   )
+#   
 
 # final merge -------------------------------------------------------------
 
@@ -120,11 +168,10 @@ df_final <- df_c %>%
   relocate(unit, .after = 3) %>% 
   relocate(plot, .after = 4) %>% 
   relocate(species, .after = 5) %>% 
-  relocate(location, .after = 6)
-  
+  relocate(location, .after = 6) 
 
-
-  
+write.csv(df_final, "outplut/combined_soil_leaf", row.names = FALSE)
+ 
 
   
   
