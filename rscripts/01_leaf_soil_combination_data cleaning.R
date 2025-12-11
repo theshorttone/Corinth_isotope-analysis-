@@ -98,6 +98,18 @@ df_soil_clean_no_dup <- df_soil_clean %>%
     duplicate = any(duplicate),                    # keep TRUE if any were duplicates
     .groups = "drop"
   )
+
+
+# join soil data with corinth_dist_to_edge --------------------------------
+
+soil_data <- 
+  df_soil_clean_no_dup %>%
+  full_join(
+    read_csv("data/corinth_dist_to_edge.csv") %>%
+      mutate(id = as.character(id)),
+    by = c("id_clean" = "id")
+  ) %>%
+  write_csv("data/soil_data_combined.csv")
  
 # combine soil and leaf ---------------------------------------------------
 
