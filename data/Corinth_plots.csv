@@ -1,0 +1,17 @@
+﻿Unit,Subplot,per_AM,Type,long,lat,Treatment,Notes
+1,1_1,9.6,EcM,-72.3232,44.0504,control,
+2,2_5,10.07,EcM,-72.3271,44.0476,cut,
+2,2_9,100,AM,-72.3279,44.046,cut,
+3,3_5,100,AM,-72.3165,44.0521,cut,
+4,4_10,100,AM,-72.3162,44.0517,control,
+6,6_5,100,AM,-72.3105,44.0573,control,
+8,8_1,100,AM,-72.3135,44.055,cut,
+10,10_5,100,AM,-72.3149,44.0502,cut,
+12,12_11,,AM,-72.31289,44.049255,control,
+14,5,,EcM,-72.31990051,44.05080032,cut,*Unit 14 is the new EcM area 
+14,6,,EcM,-72.31970215,44.05160141,cut,
+14,7,,EcM,-71.319369,44.049797,cut,*moved the center slightly so new coordinates
+14,1,,EcM,-72.319408,44.052499,control,
+14,2,,EcM,-72.319506,44.048951,control,
+1,1_10,7.28,EcM,-72.325188,44.049353,control,
+13,13_5,100,AM,-72.3289,44.0432,control,*Maybe this one can be spared cuts. Ash is 15%
