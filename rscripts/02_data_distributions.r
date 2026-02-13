@@ -138,7 +138,16 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
   geom_point()+
   geom_smooth(method = "lm", se = FALSE)+
   scale_color_manual(values = species_palette)+
-  facet_wrap(~mycorrhizal_legacy)+
+  facet_wrap(~mycorrhizal_legacy,
+             labeller = as_labeller(c(
+               "am" = "AM Legacy Plots",
+               "ecm" = "EcM Legacy PLots"
+             )))+
+  labs(
+    y = "Foliar 15N Enrichment",
+    x = "Distance to plot edge (m)",
+    color = "Tree Species"
+  )+
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_species.png", width = 8, height = 6)
@@ -150,7 +159,16 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
   geom_point()+
   geom_smooth(method = "lm", se = FALSE)+
   scale_color_manual(values = c(blues[5], oranges[5]))+
-  facet_wrap(~mycorrhizal_legacy)+
+  facet_wrap(~mycorrhizal_legacy,
+             labeller = as_labeller(c(
+               "am" = "AM Legacy Plots",
+               "ecm" = "EcM Legacy PLots"
+             )))+
+  labs(
+    y = "Foliar 15N Enrichment",
+    x = "Distance to plot edge (m)",
+    color = "Mycorrhizal Type"
+  )+
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_myc_type.png", width = 8, height = 6)
