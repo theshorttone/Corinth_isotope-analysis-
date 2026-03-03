@@ -45,7 +45,10 @@ isotope_data <-
       TRUE ~ "none"),
     species = factor(species, levels = names(species_palette)),
     distance_to_edge_m = as.numeric(distance_to_edge_m)
-      )
+      ) 
+
+  write.csv(isotope_data, "outplut/combined_soil_leaf_with_myc_type", row.names = FALSE)
+
 
   
   
