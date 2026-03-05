@@ -84,7 +84,11 @@ filter(isotope_data, !is.na(leaf_d13c)) %>%
 isotope_data <- isotope_data %>%
   mutate(
     foliar_15N_enrichment = leaf_d15n - soil_d15n
-  )
+  ) 
+  
+  write_csv(isotope_data, "outplut/combined_soil_leaf_with_myc_type_and_enrichment.csv")
+    
+    
 
 # Plot foliar 15N enrichment distribution ----------------------------------
 
@@ -154,6 +158,26 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_species.png", width = 8, height = 6)
+
+filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
+  ggplot(aes(x = distance_to_edge_m, y = leaf_percent_n, color = species))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE)+
+  scale_color_manual(values = species_palette)+
+  facet_wrap(~mycorrhizal_legacy,
+             labeller = as_labeller(c(
+               "am" = "AM Legacy Plots",
+               "ecm" = "EcM Legacy PLots"
+             )))+
+  labs(
+    y = "leaf_percent_n",
+    x = "Distance to plot edge (m)",
+    color = "Tree Species"
+  )+
+  theme_few()
+
+ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_species.png", width = 8, height = 6)
+
 
 
 

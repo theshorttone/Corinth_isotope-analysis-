@@ -28,7 +28,9 @@ def_key <- read_csv(dist_to_edge_filepath)
 df_soil_redo <- read_csv(soil_redo_filepath)
 
 
-
+df_leaf_clean %>% 
+  select(unit, plot, species, tree_number) %>%
+  unique()
 
 # data wrangling ----------------------------------------------------------
 
@@ -160,7 +162,8 @@ df_c <- bind_rows(
   # ---- 2. Add back all rows with NA ID unchanged ----
   df_c_raw %>% 
     filter(is.na(id))
-)
+) %>% 
+  arrange(leaf_d13c)
 
 
 # 
