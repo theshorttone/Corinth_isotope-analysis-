@@ -14,11 +14,23 @@ soil_data_filepath <- "data/corinth_soil_2024.csv"
 dist_to_edge_filepath <- "data/corinth_dist_to_edge.csv"
 soil_redo_filepath <- "data/corinth_soil_redo.csv"
 
+soil_redo2 <- data.frame(
+  soil_lab_id = c("AMELIA 3", "AMELIA 42", "AMELIA 228", "AMELIA 230"),
+  id_clean = (as.character(c(3, 42, 228, 230))),
+  id_number = (as.character(c(3, 42, 228, 230))),
+  soil_d15n   = c(3.59479975, 4.77429261, 7.1326268, 6.5334393),
+  soil_percent_n  = c(1.47635364, 0.43086408, 0.37393843, 0.25779551)
+)
+
 df_leaf <- read_csv(leaf_data_filepath)
 df_soil <- read_csv(soil_data_filepath)
 def_key <- read_csv(dist_to_edge_filepath)
 df_soil_redo <- read_csv(soil_redo_filepath)
 
+
+df_leaf_clean %>% 
+  select(unit, plot, species, tree_number) %>%
+  unique()
 
 # data wrangling ----------------------------------------------------------
 
@@ -52,7 +64,9 @@ df_soil_redo_clean <- df_soil_redo %>%
     mutate(
       id_number = str_remove(g_id_number, "^[0-9]+G_"),
       id_clean = str_remove(id_number, "_.*$")) %>% 
-  relocate(id_clean, .after = 1) 
+  relocate(id_clean, .after = 1) %>% 
+  bind_rows(
+    (soil_redo2))
   
   
   
@@ -148,7 +162,8 @@ df_c <- bind_rows(
   # ---- 2. Add back all rows with NA ID unchanged ----
   df_c_raw %>% 
     filter(is.na(id))
-)
+) %>% 
+  arrange(leaf_d13c)
 
 
 # 
