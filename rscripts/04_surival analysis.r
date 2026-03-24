@@ -4,6 +4,8 @@
 # setup  ----------------------------------------------------------------
 
 library(tidyverse)
+# install.packages("brms")
+# install.packages("mgcv")
 
 
 # Function to clean data 
@@ -38,8 +40,37 @@ clean_colnames <- function(df) {
     )
 }
 
+# Plotting theme 
 
-# data import -------------------------------------------------------------
+my_theme <- function() {
+  ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.text = element_text(size = 12),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.title = element_text(size = 14),
+      strip.text.x = element_text(size = 12),
+      legend.position = "bottom"
+    )
+}
+
+# colors for graphing
+
+blues   <- RColorBrewer::brewer.pal(9, "Blues")
+oranges <- RColorBrewer::brewer.pal(9, "Oranges")
+
+species_palette <- c(
+  "prse" = blues[3],
+  "acsa" = blues[5],
+  "acru" = blues[7],
+  "nysy" = blues[9],
+  "bele" = oranges[3],
+  "quru" = oranges[5],
+  "tiam" = oranges[7],
+  "caco" = oranges[9]
+)
+# data processing -------------------------------------------------------------
 
 seedling_data <- 
   # 2021 - 2022 seedling survival and growth data
@@ -79,27 +110,77 @@ seedling_data <-
   # add the 15N data
   
   inner_join(
-    read_csv("data/soil_data_combined.csv") %>%
+    read_csv("outplut/combined_soil_leaf_with_myc_type_and_enrichment.csv") %>%
       
       # clean data 
       
       clean_colnames() %>%
       mutate(number = as.numeric(tree_number)) %>%
-      select(-c(soil_lab_id, id_number, id_clean, soil_sample_weight, soil_plate_pos, g_id_number, duplicate, tree_number,`___18`)),
+      select(-c(soil_lab_id, id_number, soil_sample_weight, soil_plate_pos, g_id_number, duplicate, tree_number,`___17`,leaf_lab_id,leaf_plate_pos)) ,
     
     by = c("unit", "plot", "species", "number")
   )
 
 
 
-# Survival curve calculation ----------------------------------------------
+# Growth and isotope visualizations  ----------------------------------------------
+
+# by seedling
 
 seedling_data %>%
-  
-  ggplot(aes(height_change, soil_d15n))
+  ggplot(aes(foliar_15n_enrichment, height_change, color = species)) + 
+  geom_point(size = 3) + 
+  scale_color_manual(values = species_palette) +
+  geom_smooth(method = "lm") +
+  my_theme() + 
+  facet_wrap(~year, scales = "free")
 
- 
-  
+# by mycorrhizal type
+
+seedling_data %>%
+  ggplot(aes(foliar_15n_enrichment, height_change, color = myc_type)) + 
+  geom_point(size = 3) + 
+  scale_color_manual(values = c(blues[5], oranges[5])) +
+  geom_smooth(method = "lm") +
+  my_theme() + 
+  facet_wrap(vars(year, mycorrhizal_legacy), scales = "free")
+
+# seedling_data %>%
+
+seedling_data %>%
+ggplot(aes(leaf_percent_n, height_change, color = myc_type)) + 
+  geom_point(size = 3) + 
+  scale_color_manual(values = c(blues[5], oranges[5])) +
+  geom_smooth(method = "lm") +
+  my_theme() + 
+  facet_wrap(vars(year, mycorrhizal_legacy), scales = "free")
+
+# seedling_data %>%
+
+seedling_data %>%
+  filter(year == "2023") %>%
+  ggplot(aes(leaf_percent_n, foliar_15n_enrichment, color = myc_type)) + 
+  geom_point(size = 3) + 
+  scale_color_manual(values = c(blues[5], oranges[5])) +
+  geom_smooth(method = "lm") +
+  my_theme() + 
+  facet_wrap(~mycorrhizal_legacy)
+
+# am seedlings in EcM plots have more nitrogen when it is more "mycorrhizal derived"
+
+
+# Analyses for growth ~ 15N ---------------------------------------------------------
+
+mod_1 <- 
+  brms::brm(height_change ~ foliar_15n_enrichment * myc_type * mycorrhizal_legacy + (1 | plot) + (1 | species),
+            data = seedling_data %>%
+              filter(year == "2023"))
+
+# Analyses for change in growth increment over time -----------------------
+
+# gam models allow for non-linearity over time 
+
+mgcv::gam(height_change ~ year * myc_type * mycorrhizal_legacy + (1 | plot/seedling))
 
   
   

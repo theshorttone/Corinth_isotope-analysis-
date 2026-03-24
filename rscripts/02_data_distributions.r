@@ -6,8 +6,8 @@ library(tidyverse)
 library(ggthemes)
 library(RColorBrewer)
 
-blues   <- brewer.pal(9, "Blues")
-oranges <- brewer.pal(9, "Oranges")
+blues   <- RColorBrewer::brewer.pal(9, "Blues")
+oranges <- RColorBrewer::brewer.pal(9, "Oranges")
 
 species_palette <- c(
   "PRSE" = blues[3],
@@ -19,7 +19,20 @@ species_palette <- c(
   "TIAM" = oranges[7],
   "CACO" = oranges[9]
 )
+# Plotting theme 
 
+my_theme <- function() {
+  ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.text = element_text(size = 12),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.title = element_text(size = 14),
+      strip.text.x = element_text(size = 12),
+      legend.position = "bottom"
+    )
+}
 
 
 # load files --------------------------------------------------------------
@@ -47,7 +60,7 @@ isotope_data <-
     distance_to_edge_m = as.numeric(distance_to_edge_m)
       ) 
 
-  write.csv(isotope_data, "outplut/combined_soil_leaf_with_myc_type", row.names = FALSE)
+  #write.csv(isotope_data, "outplut/combined_soil_leaf_with_myc_type", row.names = FALSE)
 
 
   
@@ -74,7 +87,7 @@ filter(isotope_data, !is.na(leaf_d13c)) %>%
     x = "Leaf δ13C (‰)",
     y = "Frequency"
   ) +
-  theme_few()
+  my_theme()
 
 
 # Isotope calculations ----------------------------------------------------
