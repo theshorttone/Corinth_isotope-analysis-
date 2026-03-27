@@ -119,7 +119,13 @@ seedling_data <-
       select(-c(soil_lab_id, id_number, soil_sample_weight, soil_plate_pos, g_id_number, duplicate, tree_number,`___17`,leaf_lab_id,leaf_plate_pos)) ,
     
     by = c("unit", "plot", "species", "number")
-  )
+  ) %>%
+  
+  # remove the tiam data as so many values were lost
+  
+  filter(species != "tiam") %>%
+  
+  na.omit() 
 
 
 
@@ -169,12 +175,70 @@ seedling_data %>%
 # am seedlings in EcM plots have more nitrogen when it is more "mycorrhizal derived"
 
 
-# Analyses for growth ~ 15N ---------------------------------------------------------
+
+
+# PCA for growth - using height, rcd, herbivory data ----------------------
+
+pca_growth <- 
+  seedling_data %>%
+  select(height_change, rcd_change, ht_cm_initial, rcd_mm_initial, herbivory, condition) %>%
+  prcomp(scale = TRUE, center = TRUE)
+
+# variance explained
+
+summary(pca_growth)$importance["Proportion of Variance", 1:3] # 33 and 25  for 57% total variation explained
+
+# visualize
+
+factoextra::fviz_pca_var(pca_growth,
+                         col.var = "contrib", # Color by contributions to the PC
+                         gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                         # Avoid text overlapping
+                         repel = TRUE )
+
+
+# add PC axes 
+seedling_data %>%
+  
+mutate(PC1 = pca_growth$x[,1] , 
+       PC2 = pca_growth$x[,2]) %>%
+  
+  write_csv("outplut/alldata_03262026.csv")
+
+# Bayesian analyses for growth ~ 15N ---------------------------------------------------------
 
 mod_1 <- 
-  brms::brm(height_change ~ foliar_15n_enrichment * myc_type * mycorrhizal_legacy + (1 | plot) + (1 | species),
+  brms::brm(height_change ~ foliar_15n_enrichment + leaf_percent_n + mycorrhizal_legacy + myc_type + (1 | site_unit) + (1 | species),
+            data = seedling_data %>%
+              filter(year == "2021"))
+
+summary(mod_1)
+
+# package to specifically check brms models
+# https://pakillo.github.io/DHARMa.helpers/
+
+# overall model residuals
+DHARMa.helpers::dh_check_brms(mod_1)
+
+# now test for residuals agains foliar N enrich
+plot(mod_1, form = seedling_data$foliar_15n_enrichment)
+# the catepillars look good
+
+# test for overdispersion
+DHARMa.helpers::testDispersion(mod_1)
+
+
+# Frequentist modeling for relationship between nitrogen and seedl --------
+
+mod_2 <- 
+  lme4::lmer(height_change ~ foliar_15n_enrichment + leaf_percent_n + mycorrhizal_legacy + myc_type
+           + (1 | site_unit) + (1 | species) + (1 | site_unit/species) ,
             data = seedling_data %>%
               filter(year == "2023"))
+
+# issues with model convergence
+
+summary(mod_2)
 
 # Analyses for change in growth increment over time -----------------------
 
