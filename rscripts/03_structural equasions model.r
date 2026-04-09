@@ -19,7 +19,7 @@ myc_alldata <-
 #### hypothesized relationships ###
 
 # seedling growth ~ leaf n concentration 
-  # absolute growth to 2023, or could try just 2021 (why did we collect growth in 2023????)
+  # absolute growth to 2023
 
 # leaf n concentration ~ mycorrhizal mediation (15N enrichment) * mycorrhizal legacy * mycorrhizal association + proximity to root networks/competition (distance to edge)
   # myc mediation will depend on the mycorrhizal legacy and seedling association 
@@ -37,27 +37,37 @@ myc_2023 <-
   
   mutate(
     myc_legacy_num = case_when(mycorrhizal_legacy == "ecm" ~ 0, TRUE ~ 1),
-    myc_type_num = case_when(myc_type == "ecm" ~ 0, TRUE ~ 1)
+    myc_type_num = case_when(myc_type == "ecm" ~ 0, TRUE ~ 1),
+    
+    # scale numeric variables
+    
+    dist_s = scale(distance_to_edge_m)[,1]
   )
 
 # seedling model
 # PC1 is postive height and rcd change, opposite of the seedling condition
 mod_1 <-
-  lme4::lmer(height_change ~  leaf_percent_n  * myc_legacy_num +  myc_type_num + distance_to_edge_m
+  lme4::lmer(height_change ~  leafn_s  * myc_legacy_num + n15_s  + dist_s
            + (1 | site_unit) + (1 | species) ,
            data = myc_2023)
+summary(mod_1)
 car::Anova(mod_1)
-plot(resid(mod_1))
+plot(resid(mod_1)~ myc_2023$distance_to_edge_m)
+
+emmeans::emtrends(mod_1 ,~ myc_legacy_num*leaf_percent_n, var = "leaf_percent_n")
+emmeans::emtrends(mod_1 ,pairwise ~ leaf_percent_n*myc_legacy_num, var = "leaf_percent_n")
 
 # percent N model 
 
-mod_2 <-
-  lme4::lmer(leaf_percent_n  ~  foliar_15n_enrichment + distance_to_edge_m
-               + (1 | site_unit) + (1 | species) ,
+mod_2_V2 <-
+  lme4::lmer(leaf_percent_n  ~  foliar_15n_enrichment + distance_to_edge_m + myc_type_num
+               + (1 | site_unit),
              data = myc_2023)
-summary(mod_2)
-car::Anova(mod_2)
-plot(resid(mod_2))
+
+AIC(mod_2, mod_2_V2)
+summary(mod_2_V2)
+car::Anova(mod_2_V2)
+plot(resid(mod_2_V2)~ myc_2023$distance_to_edge_m)
 
 # percent N model 
 
@@ -65,9 +75,15 @@ mod_3 <-
   lme4::lmer(foliar_15n_enrichment  ~  distance_to_edge_m * myc_legacy_num * myc_type_num
                + (1 | site_unit) + (1 | species) ,
              data = myc_2023)
+
 summary(mod_3)
 car::Anova(mod_3)
 plot(resid(mod_3))
+
+emmeans::emtrends(mod_3 ,~ myc_type_num*distance_to_edge_m, var = "distance_to_edge_m")
+emmeans::emtrends(mod_3 ,pairwise ~ distance_to_edge_m*myc_type_num, var = "distance_to_edge_m")
+
+# for am seedlings, further from edge 15N increases, so closer to edge = more mycorrhizal mediated
 
 
 # SEM

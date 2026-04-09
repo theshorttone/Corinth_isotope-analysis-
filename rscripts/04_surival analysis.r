@@ -72,6 +72,36 @@ species_palette <- c(
 )
 # data processing -------------------------------------------------------------
 
+# Sampling date and time for growth calculations
+
+planting_dates <-
+  
+  read_csv("data/Corinth_seedling_data.csv") %>%
+  clean_colnames() %>%
+  # filter(year == "2021") %>%
+  select(unit, plot, planting_date, time_months, year) %>%
+  distinct() %>% 
+  drop_na() %>%
+  
+  mutate(
+    planting_date = as.Date(planting_date, format = "%m/%d/%y")
+  ) %>%
+  
+  { bind_rows(
+    .,
+    mutate(
+      .,
+      time_months = as.numeric(
+        difftime(as.Date("2023-09-02"), planting_date, units = "days")
+      ) / 30.44,
+      year = 2023
+    )
+  )
+  } %>%
+  distinct()
+
+# full seedling dataset
+
 seedling_data <- 
   # 2021 - 2022 seedling survival and growth data
   read_csv("data/seedling_demography/ Corinth_seedling_data.csv") %>%
@@ -98,13 +128,35 @@ seedling_data <-
           select(unit, plot, species, number, ht_cm_initial, rcd_mm_initial), 
         by = c("unit", "plot", "species", "number")
         )
-     ) %>%
+  ) %>%
   mutate(
-         status = case_when(health == "d" ~ 0, 
-                            TRUE ~ 1), 
-         
-         height_change = ht_cm - ht_cm_initial,
-         rcd_change = rcd_mm - rcd_mm_initial) %>%
+    status = case_when(health == "d" ~ 0, 
+                       TRUE ~ 1), 
+    
+    height_change = ht_cm - ht_cm_initial,
+    rcd_change = rcd_mm - rcd_mm_initial ) %>%
+  
+  # pull 2022 positive growth values
+  # left_join(
+  #   seedling_data %>%
+  #     filter(year == 2022) %>%
+  #     select(id, 
+  #            height_change_2022 = height_change,
+  #            rcd_change_2022 = rcd_change),
+  #   by = "id"
+  # ) %>%
+  # 
+  # # conditionally replace 2023 negatives
+  # mutate(
+  #   height_change = if_else(
+  #     year == 2023 &
+  #       height_change < 0, 
+  #       # herbivory == 1 &,
+  #     height_change_2022,
+  #     height_change
+  #   )
+  #  ) %>%
+  # select(-c(height_change_2022, rcd_change_2022)) %>%
 
 
   # add the 15N data
@@ -125,39 +177,73 @@ seedling_data <-
   
   filter(species != "tiam") %>%
   
-  na.omit() 
+  na.omit() %>%
+  
+  # add biomass calculations
+  
+  left_join(
+    #create dataset for greenbiomass from Miles and Smith 2009
+    tibble(species = c("acru","acsa","nysy", "prse","bele","caco","quru","tiam"),
+           sggw = c(0.49,0.56,0.46,0.47,0.6,0.6,0.56,0.32) ),
+    by = "species"
+  ) %>%
+  
+  # planting dates
+  
+  left_join(
+    planting_dates, 
+    by = c("unit", "plot", "year")
+  ) %>%
+ 
+  # calculate growth 
+  
+  mutate(
+    biomass = (3.14*((rcd_mm/10)^2)*(ht_cm/3))*sggw*1,
+    biomass_initial = (3.14*((rcd_mm_initial/10)^2)*(ht_cm_initial/3))*sggw*1,
+    biomass_growth = (log(biomass) - log(biomass_initial))/time_months
+  ) %>%
+  
+  # add scaled values for th brms models
+  
+  mutate(
+    n15_s = scale(foliar_15n_enrichment)[,1],
+    leafn_s = scale(leaf_percent_n)[,1],
+    herbivory_s = scale(herbivory)[,1],
+  ) %>%
+  
+  write_csv("outplut/alldata_03262026.csv")
 
 
-
+###
 # Growth and isotope visualizations  ----------------------------------------------
 
 # by seedling
 
 seedling_data %>%
-  ggplot(aes(foliar_15n_enrichment, height_change, color = species)) + 
+  ggplot(aes(foliar_15n_enrichment, biomass_growth, color = species)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = species_palette) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "gam") +
   my_theme() + 
   facet_wrap(~year, scales = "free")
 
 # by mycorrhizal type
 
 seedling_data %>%
-  ggplot(aes(foliar_15n_enrichment, height_change, color = myc_type)) + 
+  ggplot(aes(foliar_15n_enrichment, biomass_growth, color = myc_type)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = c(blues[5], oranges[5])) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "gam") +
   my_theme() + 
   facet_wrap(vars(year, mycorrhizal_legacy), scales = "free")
 
 # seedling_data %>%
 
 seedling_data %>%
-ggplot(aes(leaf_percent_n, height_change, color = myc_type)) + 
+ggplot(aes(leaf_percent_n, biomass_growth, color = myc_type)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = c(blues[5], oranges[5])) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "gam") +
   my_theme() + 
   facet_wrap(vars(year, mycorrhizal_legacy), scales = "free")
 
@@ -168,7 +254,7 @@ seedling_data %>%
   ggplot(aes(leaf_percent_n, foliar_15n_enrichment, color = myc_type)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = c(blues[5], oranges[5])) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "gam") +
   my_theme() + 
   facet_wrap(~mycorrhizal_legacy)
 
@@ -201,37 +287,43 @@ factoextra::fviz_pca_var(pca_growth,
 seedling_data %>%
   
 mutate(PC1 = pca_growth$x[,1] , 
-       PC2 = pca_growth$x[,2]) %>%
+       PC2 = pca_growth$x[,2])
   
-  write_csv("outplut/alldata_03262026.csv")
+  
+
+
+
 
 # Bayesian analyses for growth ~ 15N ---------------------------------------------------------
 
 mod_1 <- 
-  brms::brm(height_change ~ foliar_15n_enrichment + leaf_percent_n + mycorrhizal_legacy + myc_type + (1 | site_unit) + (1 | species),
+  brms::brm(biomass_growth ~ n15_s + leafn_s + mycorrhizal_legacy + myc_type + herbivory_s + (1 | site_unit) + (1 | species),
             data = seedling_data %>%
-              filter(year == "2021"))
+              filter(year == "2023"))
 
 summary(mod_1)
 
-# package to specifically check brms models
-# https://pakillo.github.io/DHARMa.helpers/
+mod_2 <- 
+  brms::brm(height_change ~ n15_s + leafn_s + mycorrhizal_legacy + myc_type + herbivory_s + (1 | site_unit) + (1 | species),
+            data = seedling_data %>%
+              filter(year == "2023"))
 
-# overall model residuals
-DHARMa.helpers::dh_check_brms(mod_1)
+summary(mod_2)
 
-# now test for residuals agains foliar N enrich
-plot(mod_1, form = seedling_data$foliar_15n_enrichment)
-# the catepillars look good
+# test for interactions
 
-# test for overdispersion
-DHARMa.helpers::testDispersion(mod_1)
+mod_3 <- 
+  brms::brm(height_change ~ n15_s + leafn_s + mycorrhizal_legacy + myc_type + herbivory_s + (1 | site_unit) + (1 | species),
+            data = seedling_data %>%
+              filter(year == "2023"))
+
+summary(mod_2)
 
 
 # Frequentist modeling for relationship between nitrogen and seedl --------
 
 mod_2 <- 
-  lme4::lmer(height_change ~ foliar_15n_enrichment + leaf_percent_n + mycorrhizal_legacy + myc_type
+  lme4::lmer(height_change ~ n15_s + leafn_s + mycorrhizal_legacy + myc_type
            + (1 | site_unit) + (1 | species) + (1 | site_unit/species) ,
             data = seedling_data %>%
               filter(year == "2023"))
@@ -242,9 +334,7 @@ summary(mod_2)
 
 # Analyses for change in growth increment over time -----------------------
 
-# gam models allow for non-linearity over time 
 
-mgcv::gam(height_change ~ year * myc_type * mycorrhizal_legacy + (1 | plot/seedling))
 
   
   

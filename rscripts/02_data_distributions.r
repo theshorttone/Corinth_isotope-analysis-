@@ -167,7 +167,7 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
     y = "Foliar 15N Enrichment",
     x = "Distance to plot edge (m)",
     color = "Tree Species"
-  )+
+  ) +
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_species.png", width = 8, height = 6)
@@ -186,7 +186,7 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
     y = "leaf_percent_n",
     x = "Distance to plot edge (m)",
     color = "Tree Species"
-  )+
+  ) +
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_species.png", width = 8, height = 6)
@@ -208,7 +208,7 @@ filter(isotope_data, !is.na(foliar_15N_enrichment)) %>%
     y = "Foliar 15N Enrichment",
     x = "Distance to plot edge (m)",
     color = "Mycorrhizal Type"
-  )+
+  ) +
   theme_few()
 
 ggsave("outplut/figures/foliar_15N_enrichment_vs_distance_to_edge_myc_type.png", width = 8, height = 6)
