@@ -240,7 +240,7 @@ seedling_data %>%
 # seedling_data %>%
 
 seedling_data %>%
-ggplot(aes(leaf_percent_n, biomass_growth, color = myc_type)) + 
+ggplot(aes(leaf_percent_n, height_change, color = myc_type)) + 
   geom_point(size = 3) + 
   scale_color_manual(values = c(blues[5], oranges[5])) +
   geom_smooth(method = "gam") +

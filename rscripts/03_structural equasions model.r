@@ -45,35 +45,54 @@ myc_2023 <-
   )
 
 # seedling model
-# PC1 is postive height and rcd change, opposite of the seedling condition
+
+mod_alt <-  
+  lme4::lmer(height_change ~  
+               leaf_percent_n +
+               condition + 
+               (1 | site_unit)  + (1 | species) ,
+             data = myc_2023)
+  
 mod_1 <-
-  lme4::lmer(height_change ~  leafn_s  * myc_legacy_num + n15_s  + dist_s
-           + (1 | site_unit) + (1 | species) ,
+  lme4::lmer(height_change ~  
+               leaf_percent_n  * myc_legacy_num * myc_type_num + 
+               foliar_15n_enrichment  + 
+               distance_to_edge_m +
+               (1 | condition ) + 
+               (1 | site_unit)  + (1 | species) ,
            data = myc_2023)
+
+AIC(mod_1, mod_alt)
 summary(mod_1)
 car::Anova(mod_1)
-plot(resid(mod_1)~ myc_2023$distance_to_edge_m)
+plot(resid(mod_1)~ myc_2023$leaf_percent_n)
 
-emmeans::emtrends(mod_1 ,~ myc_legacy_num*leaf_percent_n, var = "leaf_percent_n")
-emmeans::emtrends(mod_1 ,pairwise ~ leaf_percent_n*myc_legacy_num, var = "leaf_percent_n")
+emmeans::emtrends(mod_1 ,~ myc_type_num * myc_legacy_num * leaf_percent_n, var = "leaf_percent_n")
+emmeans::emtrends(mod_1 , ~ leaf_percent_n*myc_type_num, var = "leaf_percent_n")
 
 # percent N model 
 
 mod_2_V2 <-
-  lme4::lmer(leaf_percent_n  ~  foliar_15n_enrichment + distance_to_edge_m + myc_type_num
-               + (1 | site_unit),
+  lme4::lmer(leaf_percent_n  ~  
+               foliar_15n_enrichment + 
+               distance_to_edge_m * myc_type_num * myc_legacy_num +
+               (1 | condition) + 
+               (1 | site_unit) + (1 | species) ,
              data = myc_2023)
 
-AIC(mod_2, mod_2_V2)
+#AIC(mod_2, mod_2_V2)
 summary(mod_2_V2)
 car::Anova(mod_2_V2)
 plot(resid(mod_2_V2)~ myc_2023$distance_to_edge_m)
 
+emmeans::emtrends(mod_2_V2 ,~ myc_type_num*distance_to_edge_m, var = "distance_to_edge_m")
+
 # percent N model 
 
 mod_3 <-
-  lme4::lmer(foliar_15n_enrichment  ~  distance_to_edge_m * myc_legacy_num * myc_type_num
-               + (1 | site_unit) + (1 | species) ,
+  lme4::lmer(foliar_15n_enrichment  ~  
+               distance_to_edge_m * myc_legacy_num * myc_type_num  + 
+               (1 | site_unit)  + (1 | species) ,
              data = myc_2023)
 
 summary(mod_3)
@@ -81,7 +100,8 @@ car::Anova(mod_3)
 plot(resid(mod_3))
 
 emmeans::emtrends(mod_3 ,~ myc_type_num*distance_to_edge_m, var = "distance_to_edge_m")
-emmeans::emtrends(mod_3 ,pairwise ~ distance_to_edge_m*myc_type_num, var = "distance_to_edge_m")
+
+emmeans::emtrends(mod_3 ,~ myc_legacy_num*distance_to_edge_m, var = "distance_to_edge_m")
 
 # for am seedlings, further from edge 15N increases, so closer to edge = more mycorrhizal mediated
 
@@ -89,7 +109,7 @@ emmeans::emtrends(mod_3 ,pairwise ~ distance_to_edge_m*myc_type_num, var = "dist
 # SEM
 
 mod_global <- 
-  piecewiseSEM::psem(mod_1, mod_2, mod_3)
+  piecewiseSEM::psem(mod_1, mod_2_V2, mod_3)
 
 summary(mod_global)
 piecewiseSEM::dSep(mod_global)
