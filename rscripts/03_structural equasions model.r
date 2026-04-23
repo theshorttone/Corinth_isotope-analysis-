@@ -41,7 +41,10 @@ myc_2023 <-
     
     # scale numeric variables
     
-    dist_s = scale(distance_to_edge_m)[,1]
+    dist_s = scale(distance_to_edge_m)[,1],
+    leaf_n_s = scale(leaf_percent_n )[,1],
+    condition_s = scale(condition)[,1],
+    
   )
 
 # seedling model
@@ -74,7 +77,7 @@ emmeans::emtrends(mod_1 , ~ leaf_percent_n*myc_type_num, var = "leaf_percent_n")
 
 mod_2_V2 <-
   lme4::lmer(leaf_percent_n  ~  
-               foliar_15n_enrichment + 
+               # foliar_15n_enrichment + 
                distance_to_edge_m * myc_type_num * myc_legacy_num +
                (1 | condition) + 
                (1 | site_unit) + (1 | species) ,
@@ -92,6 +95,7 @@ emmeans::emtrends(mod_2_V2 ,~ myc_type_num*distance_to_edge_m, var = "distance_t
 mod_3 <-
   lme4::lmer(foliar_15n_enrichment  ~  
                distance_to_edge_m * myc_legacy_num * myc_type_num  + 
+               leaf_percent_n +
                (1 | site_unit)  + (1 | species) ,
              data = myc_2023)
 
