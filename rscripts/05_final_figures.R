@@ -127,10 +127,16 @@ ggplot(
     fill = factor(myc_type_num)
   )
 ) +
-  geom_line() +
+  geom_line(linewidth = 2) +
   geom_ribbon(
     aes(ymin = lower, ymax = upper),
     alpha = 0.2,
     color = NA
   ) + 
-  my
+  labs(
+    y = expression("Predicted seedling height (cm)",
+    x = "Distance from plot edge (m)") ) +
+  annotate("text", label = "B", y= max(predicted_data$upper - 1), 
+           x = min(myc_2023$distance_to_edge_m ), 
+           hjust=1, size = 4) +
+  my_theme()
