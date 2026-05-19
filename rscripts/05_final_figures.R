@@ -49,7 +49,7 @@ my_theme <- function() {
 
 # height change
 
-mod_2 <-
+mod_2_alt <-
   lme4::lmer(height_change ~  
                leaf_percent_n  * myc_type + 
                foliar_15n_enrichment * myc_type + 
@@ -59,15 +59,15 @@ mod_2 <-
                (1 | site_unit)  + (1 | species) ,
              data = myc_2023)
 
-AIC(mod_alt, mod_2)
+AIC(mod_2_alt, mod_2)
 summary(mod_2)
-car::Anova(mod_2)
+car::Anova(mod_2_alt)
 plot(resid(mod_2)~ myc_2023$leaf_percent_n)
 
 emmeans::emtrends(mod_2 ,~ myc_type_num * myc_legacy_num * leaf_percent_n, var = "leaf_percent_n")
 emmeans::emtrends(mod_2 , ~ leaf_percent_n*myc_type_num, var = "leaf_percent_n")
 
-emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type_num, var = "distance_to_edge_m")
+emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type, var = "distance_to_edge_m")
 
 # create predicted dataset
 
@@ -81,30 +81,30 @@ predicted_data <- tibble(
   
   myc_type = rep(
     unique(myc_2023$myc_type),
-    each = length(unique(myc_2023$distance_to_edge_m))
-  ),
+    each = length(unique(myc_2023$distance_to_edge_m)) ),
   
   leaf_percent_n = mean(myc_2023$leaf_percent_n, na.rm = TRUE),
   
   foliar_15n_enrichment = mean(
     myc_2023$foliar_15n_enrichment,
-    na.rm = TRUE
-  ),
-  
+    na.rm = TRUE),
+  mycorrhizal_legacy = rep(
+    unique(myc_2023$mycorrhizal_legacy),
+    each = length(unique(myc_2023$distance_to_edge_m)) ),
   condition = NA,
   site_unit = NA,
   species = NA
 ) %>%
   
-  mutate(
-    mycorrhizal_legacy = factor(
-      "am",
-      levels = levels(factor(myc_2023$mycorrhizal_legacy))
-    )
-  ) %>%
+  # mutate(
+  #   mycorrhizal_legacy = factor(
+  #     "am",
+  #     levels = levels(factor(myc_2023$mycorrhizal_legacy))
+  #   )
+  # ) %>%
   
   mutate(
-    pred_height = predict(mod_2, newdata = ., re.form = NA)
+    pred_height = predict(mod_2_alt, newdata = ., re.form = NA)
   )
 
 X_pred <- model.matrix(
@@ -115,7 +115,7 @@ X_pred <- model.matrix(
 )
 
 se_preds <- sqrt(
-  diag(X_pred %*% vcov(mod_2) %*% t(X_pred))
+  diag(X_pred %*% vcov(mod_2_alt) %*% t(X_pred))
 )
 
 predicted_data <- 
