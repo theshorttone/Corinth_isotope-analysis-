@@ -45,7 +45,7 @@ my_theme <- function() {
     )
 }
 
-# Height change model and figure  ------------------------------------------------------------
+# Height change ~ distance to edge  ------------------------------------------------------------
 
 # height change
 
@@ -66,6 +66,7 @@ plot(resid(mod_2)~ myc_2023$leaf_percent_n)
 
 emmeans::emtrends(mod_2 ,~ myc_type_num * myc_legacy_num * leaf_percent_n, var = "leaf_percent_n")
 emmeans::emtrends(mod_2 , ~ leaf_percent_n*myc_type_num, var = "leaf_percent_n")
+
 emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type_num, var = "distance_to_edge_m")
 
 # create predicted dataset
@@ -108,7 +109,8 @@ se_preds <- sqrt(
   diag(X_pred %*% vcov(mod_2) %*% t(X_pred))
 )
 
-predicted_data <- predicted_data %>%
+predicted_data <- 
+  predicted_data %>%
   mutate(
     se = se_preds,
     lower = pred_height - 1.96 * se,
@@ -118,20 +120,27 @@ predicted_data <- predicted_data %>%
 # plot
 height_distedge <-
 
-ggplot(
-  predicted_data,
-  aes(
-    x = distance_to_edge_m,
-    y = pred_height,
-    color = factor(myc_type_num),
-    fill = factor(myc_type_num)
-  )
-) +
-  geom_line(linewidth = 2) +
-  geom_ribbon(
-    aes(ymin = lower, ymax = upper),
-    alpha = 0.2,
-    color = NA
+ggplot() +
+geom_point(data = myc_2023,
+           aes(x = distance_to_edge_m,
+               y = height_change,
+           color = myc_type,
+           fill = myc_type ) ) +
+  geom_line(data = predicted_data,
+            aes(
+              x = distance_to_edge_m,
+              y = pred_height,
+              color = factor(myc_type_num)),
+              linewidth = 2 ) +
+  geom_ribbon(predicted_data,
+        aes(
+          x = distance_to_edge_m,
+          y = pred_height,
+          ymin = lower, 
+          ymax = upper,
+          color = factor(myc_type_num),
+          fill = factor(myc_type_num)),
+    alpha = 0.2
   ) + 
   labs(
     y = expression("Predicted seedling height (cm)",
