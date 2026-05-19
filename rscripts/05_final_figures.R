@@ -73,9 +73,7 @@ emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type_num, var = "distance_to_
 
 # predicted values for plotting CIs and trend lines 
 
-predicted_data <- 
-  
-  tibble(
+predicted_data <- tibble(
   distance_to_edge_m = rep(
     unique(myc_2023$distance_to_edge_m),
     times = length(unique(myc_2023$myc_type))
@@ -96,19 +94,17 @@ predicted_data <-
   condition = NA,
   site_unit = NA,
   species = NA
-) |>
+) %>%
   
-  dplyr::mutate(
+  mutate(
     mycorrhizal_legacy = factor(
       "am",
       levels = levels(factor(myc_2023$mycorrhizal_legacy))
-    ),
-    
-    pred_height = predict(
-      mod_2,
-      newdata = dplyr::cur_data(),
-      re.form = NA
     )
+  ) %>%
+  
+  mutate(
+    pred_height = predict(mod_2, newdata = ., re.form = NA)
   )
 
 X_pred <- model.matrix(
