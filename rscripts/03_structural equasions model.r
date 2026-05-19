@@ -41,7 +41,10 @@ myc_2023 <-
     
     # scale numeric variables
     
-    dist_s = scale(distance_to_edge_m)[,1]
+    dist_s = scale(distance_to_edge_m)[,1],
+    leaf_n_s = scale(leaf_percent_n )[,1],
+    condition_s = scale(condition)[,1],
+    
   )
 
 # seedling model
@@ -110,6 +113,7 @@ mod_3 <-
   lme4::lmer(foliar_15n_enrichment  ~  
                leaf_percent_n * myc_legacy_num * myc_type_num +
                distance_to_edge_m * myc_legacy_num * myc_type_num  + 
+               leaf_percent_n +
                (1 | site_unit)  + (1 | species) ,
              data = myc_2023)
 
