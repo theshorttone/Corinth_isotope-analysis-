@@ -51,9 +51,9 @@ my_theme <- function() {
 
 mod_2 <-
   lme4::lmer(height_change ~  
-               leaf_percent_n  * myc_type_num + 
-               foliar_15n_enrichment * myc_type_num + 
-               distance_to_edge_m * myc_type_num * myc_legacy_num +
+               leaf_percent_n  * myc_type + 
+               foliar_15n_enrichment * myc_type + 
+               distance_to_edge_m * myc_type * mycorrhizal_legacy +
                #herbivory +
                (1 | condition ) + 
                (1 | site_unit)  + (1 | species) ,
@@ -71,37 +71,50 @@ emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type_num, var = "distance_to_
 
 # create predicted dataset
 
+# predicted values for plotting CIs and trend lines 
+
 predicted_data <- 
   
-  expand_grid(
-  distance_to_edge_m = seq(
-    min(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    max(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    length.out = 100
+  tibble(
+  distance_to_edge_m = rep(
+    unique(myc_2023$distance_to_edge_m),
+    times = length(unique(myc_2023$myc_type))
   ),
-  myc_type_num = unique(myc_2023$myc_type_num)
-) %>%
-  mutate(
-    myc_legacy_num = 0,
-    leaf_percent_n = mean(myc_2023$leaf_percent_n, na.rm = TRUE),
-    foliar_15n_enrichment = mean(myc_2023$foliar_15n_enrichment, na.rm = TRUE),
+  
+  myc_type = rep(
+    unique(myc_2023$myc_type),
+    each = length(unique(myc_2023$distance_to_edge_m))
+  ),
+  
+  leaf_percent_n = mean(myc_2023$leaf_percent_n, na.rm = TRUE),
+  
+  foliar_15n_enrichment = mean(
+    myc_2023$foliar_15n_enrichment,
+    na.rm = TRUE
+  ),
+  
+  condition = NA,
+  site_unit = NA,
+  species = NA
+) |>
+  
+  dplyr::mutate(
+    mycorrhizal_legacy = factor(
+      "am",
+      levels = levels(factor(myc_2023$mycorrhizal_legacy))
+    ),
     
-    condition = NA,
-    site_unit = NA,
-    species = NA
-  ) %>%
-  mutate(
     pred_height = predict(
       mod_2,
-      newdata = pick(everything()),
+      newdata = dplyr::cur_data(),
       re.form = NA
     )
   )
 
 X_pred <- model.matrix(
-  ~ leaf_percent_n * myc_type_num +
-    foliar_15n_enrichment * myc_type_num +
-    distance_to_edge_m * myc_type_num * myc_legacy_num,
+  ~  leaf_percent_n * myc_type +
+    foliar_15n_enrichment * myc_type +
+    distance_to_edge_m * myc_type * mycorrhizal_legacy,
   data = predicted_data
 )
 
@@ -130,16 +143,16 @@ geom_point(data = myc_2023,
             aes(
               x = distance_to_edge_m,
               y = pred_height,
-              color = factor(myc_type_num)),
+              color = factor(myc_type)),
               linewidth = 2 ) +
-  geom_ribbon(predicted_data,
+  geom_ribbon(data = predicted_data,
         aes(
           x = distance_to_edge_m,
           y = pred_height,
           ymin = lower, 
           ymax = upper,
-          color = factor(myc_type_num),
-          fill = factor(myc_type_num)),
+          color = factor(myc_type),
+          fill = factor(myc_type)),
     alpha = 0.2
   ) + 
   labs(
