@@ -88,6 +88,7 @@ plot(resid(mod_2)~ myc_2023$leaf_percent_n)
 
 emmeans::emtrends(mod_2 ,~ myc_type_num * myc_legacy_num * leaf_percent_n, var = "leaf_percent_n")
 emmeans::emtrends(mod_2 , ~ leaf_percent_n*myc_type_num, var = "leaf_percent_n")
+
 emmeans::emtrends(mod_2 , ~ distance_to_edge_m*myc_type_num, var = "distance_to_edge_m")
 
 # percent N model 
