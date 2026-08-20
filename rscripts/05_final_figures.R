@@ -278,6 +278,12 @@ model_line_plot <- function(
     my_theme()
 }
 
+# soil CN distributions  --------------------------------------------------
+
+myc_alldata %>%
+  
+  ggplot(aes(x = ))
+  
 # Height change ~ distance to edge  ------------------------------------------------------------
 
 # height change
