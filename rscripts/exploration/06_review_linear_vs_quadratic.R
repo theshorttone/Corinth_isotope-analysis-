@@ -50,6 +50,17 @@ fit_control <- lmerControl(
 # We use maximum likelihood (REML = FALSE) because the linear and quadratic
 # models have different fixed effects and will be compared with an LRT and AIC.
 
+# supplemental soil percent N analyses ------------------------------------
+
+perN <- lmer(
+  soil_percent_n ~
+    dist_c * mycorrhizal_legacy + 
+   (1 | site_unit) ,
+  data = dat, REML = FALSE, control = fit_control
+)
+
+summary(perN)
+
 
 # -----------------------------------------------------------------------------
 # 1. HEIGHT CHANGE
@@ -172,6 +183,7 @@ n15_dat <- dat %>%
 n15_linear <- lmer(
   foliar_15n_enrichment ~
     dist_c * myc_type * mycorrhizal_legacy +
+    leaf_percent_n * mycorrhizal_legacy * myc_type +
     (1 | condition) + (1 | site_unit) + (1 | species),
   data = n15_dat, REML = FALSE, control = fit_control
 )
@@ -179,6 +191,7 @@ n15_linear <- lmer(
 n15_overall_quadratic <- lmer(
   foliar_15n_enrichment ~
     dist_c * myc_type * mycorrhizal_legacy + dist_c2 +
+    leaf_percent_n * mycorrhizal_legacy * myc_type +
     (1 | condition) + (1 | site_unit) + (1 | species),
   data = n15_dat, REML = FALSE, control = fit_control
 )
@@ -186,6 +199,7 @@ n15_overall_quadratic <- lmer(
 n15_myc_quadratic <- lmer(
   foliar_15n_enrichment ~
     dist_c * myc_type * mycorrhizal_legacy + dist_c2 * myc_type +
+    leaf_percent_n * mycorrhizal_legacy * myc_type +
     (1 | condition) + (1 | site_unit) + (1 | species),
   data = n15_dat, REML = FALSE, control = fit_control
 )
@@ -193,6 +207,7 @@ n15_myc_quadratic <- lmer(
 n15_group_quadratic <- lmer(
   foliar_15n_enrichment ~
     (dist_c + dist_c2) * myc_type * mycorrhizal_legacy +
+    leaf_percent_n * mycorrhizal_legacy * myc_type +
     (1 | condition) + (1 | site_unit) + (1 | species),
   data = n15_dat, REML = FALSE, control = fit_control
 )

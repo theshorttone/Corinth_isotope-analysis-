@@ -42,9 +42,10 @@ harvest plots.
    C:N by legacy from `data/Corinth.alldata.csv`.
 
 Exploratory / archived:
-- `05_final_figures_quadratic.R`, `06_review_linear_vs_quadratic.R`,
-  `06_test_quadratic_fits.R`, `07`–`13`: linear vs. quadratic vs. GAMM
-  distance-response comparisons. The final models are linear.
+- `rscripts/exploration/`: linear vs. quadratic vs. GAMM distance-response
+  comparisons (`05_final_figures_quadratic.R`, `06_review_linear_vs_quadratic.R`,
+  `06_test_quadratic_fits.R`, `07`–`13`) and early soil N testing. The final
+  models are linear; these are not part of the manuscript pipeline.
 - `outtakes.R`: analyses removed from 05 when the figure set was narrowed.
 - `decoupling_sourcescript (3).R`: unrelated HJ Andrews microclimate script.
 
@@ -56,4 +57,4 @@ Exploratory / archived:
 - Script 01 references `df_leaf_clean` before it is defined, so it won't run
   top to bottom as is.
 - `condition` is 0/1 (set in script 04); it's a fixed effect in 05 but a random
-  intercept in 03 and 11–13.
+  intercept in 03 and the exploration scripts.

@@ -32,6 +32,7 @@ myc_2023 <-
   myc_alldata %>%
   filter(year == "2023") %>%
   droplevels() %>%
+  distinct() %>%
   
   # turn the factors into numeric variables
   
@@ -64,7 +65,7 @@ mod_alt <-
 mod_1 <-
   lme4::lmer(height_change ~  
                leaf_percent_n  * myc_legacy_num * myc_type_num + 
-               foliar_15n_enrichment  + 
+               foliar_15n_enrichment + 
                distance_to_edge_m +
                #herbivory +
                (1 | condition ) + 
@@ -114,7 +115,6 @@ mod_3 <-
   lme4::lmer(foliar_15n_enrichment  ~  
                leaf_percent_n * myc_legacy_num * myc_type_num +
                distance_to_edge_m * myc_legacy_num * myc_type_num  + 
-               leaf_percent_n +
                (1 | site_unit)  + (1 | species) ,
              data = myc_2023)
 
@@ -124,7 +124,9 @@ plot(resid(mod_3))
 
 emmeans::emtrends(mod_3 ,~ myc_type_num*distance_to_edge_m, var = "distance_to_edge_m")
 
-emmeans::emtrends(mod_3 ,~ myc_legacy_num *myc_type_num*leaf_percent_n, var = "leaf_percent_n")
+emmeans::emmeans(mod_3, ~myc_legacy_num)
+
+emmeans::emtrends(mod_3 ,~ myc_legacy_num *leaf_percent_n, var = "leaf_percent_n")
 
 emmeans::emtrends(mod_3 ,~ myc_type_num*myc_legacy_num*distance_to_edge_m, var = "distance_to_edge_m")
 
