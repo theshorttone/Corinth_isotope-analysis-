@@ -1,0 +1,8 @@
+"k'","edf","k-index","p-value","term","response"
+3,0.603693950912458,1.03039267808286,0.6325,"s(dist_c):groupAM_AM","leaf_percent_n"
+3,1.31114411191689,1.03039267808286,0.6525,"s(dist_c):groupECM_AM","leaf_percent_n"
+3,1.77362292093115e-05,1.03039267808286,0.6275,"s(dist_c):groupAM_ECM","leaf_percent_n"
+3,0.532609667822456,1.03039267808286,0.6425,"s(dist_c):groupECM_ECM","leaf_percent_n"
+2,0.916277091894582,NA,NA,"s(condition)","leaf_percent_n"
+8,4.08104346595249,NA,NA,"s(site_unit)","leaf_percent_n"
+7,4.66127585890904,NA,NA,"s(species)","leaf_percent_n"

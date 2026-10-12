@@ -1,0 +1,7 @@
+"k'","edf","k-index","p-value","term","response"
+3,0.869976537837998,0.897511022389889,0.0725,"s(dist_c):groupAM_AM","foliar_15n_enrichment"
+3,1.52676941629723,0.897511022389889,0.09,"s(dist_c):groupECM_AM","foliar_15n_enrichment"
+3,1.84217481330556,0.897511022389889,0.0975,"s(dist_c):groupAM_ECM","foliar_15n_enrichment"
+3,1.15048438448722,0.897511022389889,0.09,"s(dist_c):groupECM_ECM","foliar_15n_enrichment"
+8,2.68414028556365,NA,NA,"s(site_unit)","foliar_15n_enrichment"
+7,3.77849866199643,NA,NA,"s(species)","foliar_15n_enrichment"

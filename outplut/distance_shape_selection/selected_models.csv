@@ -1,0 +1,4 @@
+response,n,selected_shape,selected_shape_modifier,removed_group_factors,selected_formula,ML_AIC,ML_BIC,REML_singular
+height_change,171,linear,common,myc_type;mycorrhizal_legacy,height_change ~ leaf_percent_n + foliar_15n_enrichment + dist_c +      (1 | condition) + (1 | site_unit) + (1 | species),1822.034767734662,1847.1680761866833,FALSE
+foliar_15n_enrichment,171,linear,myc,,foliar_15n_enrichment ~ leaf_percent_n + myc_type * mycorrhizal_legacy +      (dist_c) * myc_type + (1 | site_unit) + (1 | species),684.557324239717,715.9739598047436,FALSE
+leaf_percent_n,171,linear,common,mycorrhizal_legacy;myc_type,leaf_percent_n ~ dist_c + (1 | condition) + (1 | site_unit) +      (1 | species),200.89019435273102,219.74017569174697,FALSE

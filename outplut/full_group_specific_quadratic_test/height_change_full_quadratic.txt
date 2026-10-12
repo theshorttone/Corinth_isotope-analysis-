@@ -1,0 +1,40 @@
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: height_change ~ leaf_percent_n * myc_type + foliar_15n_enrichment *  
+    myc_type + (dist_c + dist_c2) * myc_type * mycorrhizal_legacy +  
+    (1 | condition) + (1 | site_unit) + (1 | species)
+   Data: d
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   1833.9    1896.8    -897.0    1793.9       151 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.9206 -0.6350 -0.0338  0.4160  4.2930 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept)  180.3   13.43   
+ species   (Intercept) 1449.2   38.07   
+ condition (Intercept)  375.1   19.37   
+ Residual              1751.3   41.85   
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                           Estimate Std. Error t value
+(Intercept)                                46.71578   39.49298   1.183
+leaf_percent_n                              2.89348   12.99262   0.223
+myc_typeecm                               -29.58869   51.30301  -0.577
+foliar_15n_enrichment                      -3.30913    2.70439  -1.224
+dist_c                                      3.03272    1.55622   1.949
+dist_c2                                    -0.08751    0.35353  -0.248
+mycorrhizal_legacyecm                      -1.73231   17.26765  -0.100
+leaf_percent_n:myc_typeecm                 17.88729   16.58382   1.079
+myc_typeecm:foliar_15n_enrichment           0.45946    4.29021   0.107
+myc_typeecm:dist_c                         -1.96304    2.65490  -0.739
+myc_typeecm:dist_c2                        -0.80293    0.56189  -1.429
+dist_c:mycorrhizal_legacyecm                2.39523    2.41282   0.993
+dist_c2:mycorrhizal_legacyecm              -0.40943    0.60732  -0.674
+myc_typeecm:mycorrhizal_legacyecm         -28.64423   20.42424  -1.402
+myc_typeecm:dist_c:mycorrhizal_legacyecm   -2.66539    3.71264  -0.718
+myc_typeecm:dist_c2:mycorrhizal_legacyecm   1.16075    0.82029   1.415

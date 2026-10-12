@@ -1,0 +1,74 @@
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+  method [lmerModLmerTest]
+Formula: height_change ~ leaf_percent_n * myc_type + foliar_15n_enrichment *  
+    myc_type + mycorrhizal_legacy + (dist_c + dist_c2) * myc_type +  
+    (1 | condition) + (1 | site_unit) + (1 | species)
+   Data: height_dat
+Control: fit_control
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   1827.3    1874.5    -898.7    1797.3       156 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.1051 -0.5450 -0.0138  0.4520  4.2110 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept)  190.9   13.82   
+ species   (Intercept) 1453.7   38.13   
+ condition (Intercept)  424.9   20.61   
+ Residual              1784.2   42.24   
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                  Estimate Std. Error       df t value Pr(>|t|)
+(Intercept)                        56.2932    38.2193  23.4880   1.473  0.15405
+leaf_percent_n                      1.3312    12.8298 168.0635   0.104  0.91748
+myc_typeecm                       -62.0699    46.1644  29.7274  -1.345  0.18894
+foliar_15n_enrichment              -2.4312     2.5650 165.4931  -0.948  0.34460
+mycorrhizal_legacyecm             -12.5269    12.5510   8.9401  -0.998  0.34449
+dist_c                              3.7567     1.2717 158.4639   2.954  0.00362
+dist_c2                            -0.1776     0.2862 162.2719  -0.621  0.53578
+leaf_percent_n:myc_typeecm         23.6005    16.1337 166.8060   1.463  0.14540
+myc_typeecm:foliar_15n_enrichment  -2.0469     3.7173 162.3931  -0.551  0.58264
+myc_typeecm:dist_c                 -2.6402     1.8854 163.6199  -1.400  0.16330
+myc_typeecm:dist_c2                -0.2910     0.3934 161.0837  -0.740  0.46063
+                                    
+(Intercept)                         
+leaf_percent_n                      
+myc_typeecm                         
+foliar_15n_enrichment               
+mycorrhizal_legacyecm               
+dist_c                            **
+dist_c2                             
+leaf_percent_n:myc_typeecm          
+myc_typeecm:foliar_15n_enrichment   
+myc_typeecm:dist_c                  
+myc_typeecm:dist_c2                 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) lf_pr_ myc_ty fl_15_ mycrr_ dist_c dst_c2 lf__:_ m_:_15
+lef_prcnt_n -0.651                                                        
+myc_typeecm -0.540  0.446                                                 
+flr_15n_nrc  0.267  0.044 -0.164                                          
+mycrrhzl_lg -0.302  0.120  0.041 -0.230                                   
+dist_c       0.014 -0.174  0.015 -0.460 -0.009                            
+dist_c2     -0.152  0.098  0.146  0.063  0.003 -0.177                     
+lf_prcnt_:_  0.443 -0.738 -0.696 -0.046 -0.053  0.123 -0.083              
+myc_ty:_15_ -0.088 -0.079  0.276 -0.583 -0.027  0.328 -0.032 -0.010       
+myc_typcm:_ -0.013  0.133  0.074  0.352 -0.011 -0.692  0.124 -0.205 -0.265
+myc_typc:_2  0.116 -0.070 -0.189  0.009 -0.080  0.114 -0.737  0.103  0.066
+            myc_:_
+lef_prcnt_n       
+myc_typeecm       
+flr_15n_nrc       
+mycrrhzl_lg       
+dist_c            
+dist_c2           
+lf_prcnt_:_       
+myc_ty:_15_       
+myc_typcm:_       
+myc_typc:_2 -0.094

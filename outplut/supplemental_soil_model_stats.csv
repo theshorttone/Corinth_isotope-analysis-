@@ -1,0 +1,15 @@
+panel,response,result_type,term,myc_type,mycorrhizal_legacy,estimate,std_error,df,statistic,p_value,conf_low,conf_high,significance
+Figure S1a-b,soil_percent_n,fixed_effect,(Intercept),NA,NA,0.7429585556811455,0.10067458780595544,14.643815030436096,7.379802310322403,2.646746828068779e-6,NA,NA,NA
+Figure S1a-b,soil_percent_n,fixed_effect,distance_to_edge_m,NA,NA,-0.007865342991789096,0.007010189669245061,163.29981175322584,-1.1219871876356988,0.26351493530031783,NA,NA,NA
+Figure S1a-b,soil_percent_n,fixed_effect,mycorrhizal_legacyecm,NA,NA,-0.2638841513652394,0.14558302828854713,15.829502384859799,-1.8126024335901172,0.08890173710084925,NA,NA,NA
+Figure S1a-b,soil_percent_n,fixed_effect,distance_to_edge_m:mycorrhizal_legacyecm,NA,NA,0.005436059872139536,0.00976350533552116,164.1988483539969,0.5567733805974684,0.5784403440417744,NA,NA,NA
+Figure S1a-b,soil_percent_n,type_ii_wald_chisq,distance_to_edge_m,NA,NA,NA,NA,1,1.076641191972515,0.2994501612270923,NA,NA,NA
+Figure S1a-b,soil_percent_n,type_ii_wald_chisq,mycorrhizal_legacy,NA,NA,NA,NA,1,3.526761292741497,0.06038563448167304,NA,NA,NA
+Figure S1a-b,soil_percent_n,type_ii_wald_chisq,distance_to_edge_m:mycorrhizal_legacy,NA,NA,NA,NA,1,0.30999659734193336,0.5776822733550567,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,fixed_effect,(Intercept),NA,NA,13.642453433916048,0.9471827037307953,29.525507499274113,14.403191042425807,6.871738668228601e-15,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,fixed_effect,distance_to_edge_m,NA,NA,-0.009420658651126462,0.08237325276219647,165.56173172048867,-0.11436550500589047,0.9090866326230647,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,fixed_effect,mycorrhizal_legacyecm,NA,NA,5.962873684446267,1.3834107520496115,32.00669308929268,4.310269871483858,1.4534889745950486e-4,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,fixed_effect,distance_to_edge_m:mycorrhizal_legacyecm,NA,NA,0.27336405012879905,0.11446279545347171,166.52840132688755,2.3882349635600115,0.018048880811950926,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,type_ii_wald_chisq,distance_to_edge_m,NA,NA,NA,NA,1,5.338852153736178,0.020855200996901455,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,type_ii_wald_chisq,mycorrhizal_legacy,NA,NA,NA,NA,1,93.59072074673671,3.880023834992442e-22,NA,NA,NA
+Figure S1c-d,soil_cn_ratio,type_ii_wald_chisq,distance_to_edge_m:mycorrhizal_legacy,NA,NA,NA,NA,1,5.703666241170488,0.016929514311549185,NA,NA,NA

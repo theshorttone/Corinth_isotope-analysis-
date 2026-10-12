@@ -1,0 +1,9 @@
+response,question,null_model,alternative_model,chisq,df,p_value,AIC_null,AIC_alternative,delta_AIC_alternative_minus_null
+height_change,Does myc_type contribute overall?,without_myc_type,current_model,3.3484133150343496,4,0.5012983241202237,1822.885579020509,1827.5371657054748,4.65158668496565
+height_change,Does mycorrhizal_legacy contribute overall?,without_mycorrhizal_legacy,current_model,2.274277227678567,2,0.3207354580529662,1825.8114429331533,1827.5371657054748,1.7257227723214328
+height_change,"After removing myc_type, does mycorrhizal_legacy contribute overall?",without_myc_type_and_mycorrhizal_legacy,without_myc_type,1.1491887141528423,1,0.28371904455160385,1822.034767734662,1822.885579020509,0.8508112858471577
+foliar_15n_enrichment,Does myc_type contribute overall?,without_myc_type,current_model,13.230019651519001,3,0.004164680898996849,691.787343891236,684.557324239717,-7.230019651519001
+foliar_15n_enrichment,Does mycorrhizal_legacy contribute overall?,without_mycorrhizal_legacy,current_model,12.298855936119935,2,0.0021347025388797434,692.8561801758369,684.557324239717,-8.298855936119935
+leaf_percent_n,Does myc_type contribute overall?,without_myc_type,current_model,3.547201395453726,2,0.16972077408130282,200.99957085146988,201.45236945601616,0.45279860454627396
+leaf_percent_n,Does mycorrhizal_legacy contribute overall?,without_mycorrhizal_legacy,current_model,3.4705689727717868,2,0.17635002396846775,200.92293842878794,201.45236945601616,0.5294310272282132
+leaf_percent_n,"After removing mycorrhizal_legacy, does myc_type contribute overall?",without_mycorrhizal_legacy_and_myc_type,without_mycorrhizal_legacy,1.9672559239430711,1,0.16073943163812116,200.89019435273102,200.92293842878794,0.03274407605692886

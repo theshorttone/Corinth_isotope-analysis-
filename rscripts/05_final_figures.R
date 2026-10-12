@@ -1,643 +1,604 @@
+# Final manuscript figures ------------------------------------------------
+# Figure 2: distance-to-edge responses
+# Figure S1: soil N and C:N raw data plus legacy means and 95% CIs
 
-
-# setup -------------------------------------------------------------------
 library(tidyverse)
 library(lme4)
-library(lmerTest)
 library(RColorBrewer)
 
+# Data --------------------------------------------------------------------
 
-# read in data
-
-myc_alldata <-   
-  read_csv("outplut/alldata_03262026.csv") %>% 
+myc_alldata <- read_csv(
+  "outplut/alldata_03262026.csv",
+  show_col_types = FALSE
+) %>%
   mutate(
-    site_unit = factor(site_unit)
-  ) 
-
-myc_2023 <- 
-  myc_alldata %>%
-  filter(year == "2023") %>%
-  droplevels() %>%
-  
-  # turn the factors into numeric variables
-  
-  mutate(
-    myc_legacy_num = case_when(mycorrhizal_legacy == "ecm" ~ 0, TRUE ~ 1),
-    myc_type_num = case_when(myc_type == "ecm" ~ 0, TRUE ~ 1),
-    
-    # scale numeric variables
-    
-    dist_s = scale(distance_to_edge_m)[,1]
+    site_unit = factor(site_unit),
+    soil_cn_ratio = soil_percent_c / soil_percent_n
   )
 
-# Plotting theme ---------------------------------------------------------
+myc_2023 <- myc_alldata %>%
+  filter(year == 2023) %>%
+  distinct() %>%
+  droplevels()
+
+# Shared appearance -------------------------------------------------------
 
 blues <- RColorBrewer::brewer.pal(9, "Blues")
 oranges <- RColorBrewer::brewer.pal(9, "Oranges")
 
+myc_type_colors <- c("am" = blues[5], "ecm" = oranges[5])
+legacy_shapes <- c("am" = 17, "ecm" = 16)
+legacy_labels <- c("am" = "AM legacy", "ecm" = "EcM legacy")
+myc_type_labels <- c("am" = "AM tree", "ecm" = "EcM tree")
+
 my_theme <- function() {
-  ggplot2::theme_classic() +
-    ggplot2::theme(
+  theme_classic() +
+    theme(
       axis.text = element_text(size = 8),
-      axis.title.x = element_text(size = 9),
-      axis.title.y = element_text(size = 9),
+      axis.title = element_text(size = 9),
       legend.text = element_text(size = 8),
       legend.title = element_text(size = 9),
-      strip.text.x = element_text(size = 8),
-      legend.position = "bottom"
+      legend.position = "bottom",
+      plot.tag = element_text(size = 11, face = "bold")
     )
 }
 
-myc_association_colors <- c("am" = blues[5], "ecm" = oranges[5])
-
-add_fixed_effect_ci <- function(model, newdata, fixed_formula, pred_name) {
-  newdata[[pred_name]] <- predict(model, newdata = newdata, re.form = NA)
-  
-  x_pred <- model.matrix(fixed_formula, data = newdata)
-  se_pred <- sqrt(diag(x_pred %*% vcov(model) %*% t(x_pred)))
-  
-  newdata %>%
-    mutate(
-      se = se_pred,
-      lower = .data[[pred_name]] - 1.96 * se,
-      upper = .data[[pred_name]] + 1.96 * se
+add_point_scales <- function(plot) {
+  plot +
+    scale_color_manual(
+      values = myc_type_colors,
+      breaks = names(myc_type_labels),
+      labels = myc_type_labels,
+      name = "Tree mycorrhizal type"
+    ) +
+    scale_shape_manual(
+      values = legacy_shapes,
+      breaks = names(legacy_labels),
+      labels = legacy_labels,
+      name = "Mycorrhizal legacy"
     )
 }
 
-add_slope_linetype <- function(model, predicted_data, x_var, alpha = 0.05) {
-  slope_tests <-
-    emmeans::emtrends(
-      model,
-      ~ myc_type * mycorrhizal_legacy,
-      var = x_var
-    ) %>%
-    summary(infer = c(TRUE, TRUE)) %>%
-    as_tibble() %>%
-    mutate(
-      slope_linetype = case_when(
-        p.value < alpha ~ "Significant",
-        TRUE ~ "Not significant"
-      )
-    ) %>%
-    select(myc_type, mycorrhizal_legacy, slope_linetype)
-  
-  predicted_data %>%
-    left_join(slope_tests, by = c("myc_type", "mycorrhizal_legacy"))
-}
-
-get_column_or_na <- function(df, column_names) {
-  matching_column <- intersect(column_names, names(df))
-  
-  if (length(matching_column) == 0) {
-    return(rep(NA_real_, nrow(df)))
-  }
-  
-  df[[matching_column[1]]]
-}
-
-tidy_fixed_effects <- function(model, figure, response, predictor) {
-  fixed_effects <-
-    coef(summary(lmerTest::as_lmerModLmerTest(model))) %>%
-    as.data.frame()
-  
-  fixed_effects$term <- rownames(fixed_effects)
-  
-  tibble(
-    figure = figure,
-    response = response,
-    predictor = predictor,
-    statistic_type = "fixed_effect",
-    term = fixed_effects$term,
-    myc_type = NA_character_,
-    mycorrhizal_legacy = NA_character_,
-    estimate = get_column_or_na(fixed_effects, "Estimate"),
-    std_error = get_column_or_na(fixed_effects, "Std. Error"),
-    df = get_column_or_na(fixed_effects, "df"),
-    statistic = get_column_or_na(fixed_effects, "t value"),
-    p_value = get_column_or_na(fixed_effects, "Pr(>|t|)"),
-    conf_low = NA_real_,
-    conf_high = NA_real_,
-    slope_linetype = NA_character_
-  )
-}
-
-tidy_type_ii_tests <- function(model, figure, response, predictor) {
-  type_ii_tests <- car::Anova(model) %>% as.data.frame()
-  type_ii_tests$term <- rownames(type_ii_tests)
-  
-  tibble(
-    figure = figure,
-    response = response,
-    predictor = predictor,
-    statistic_type = "type_ii_wald_chisq",
-    term = type_ii_tests$term,
-    myc_type = NA_character_,
-    mycorrhizal_legacy = NA_character_,
-    estimate = NA_real_,
-    std_error = NA_real_,
-    df = get_column_or_na(type_ii_tests, "Df"),
-    statistic = get_column_or_na(type_ii_tests, "Chisq"),
-    p_value = get_column_or_na(type_ii_tests, "Pr(>Chisq)"),
-    conf_low = NA_real_,
-    conf_high = NA_real_,
-    slope_linetype = NA_character_
-  )
-}
-
-tidy_slope_tests <- function(model, figure, response, predictor, x_var, alpha = 0.05) {
-  slope_tests <-
-    emmeans::emtrends(
-      model,
-      ~ myc_type * mycorrhizal_legacy,
-      var = x_var
-    ) %>%
-    summary(infer = c(TRUE, TRUE)) %>%
-    as_tibble()
-  
-  trend_column <- paste0(x_var, ".trend")
-  
-  tibble(
-    figure = figure,
-    response = response,
-    predictor = predictor,
-    statistic_type = "simple_slope",
-    term = paste0("slope of ", response, " over ", predictor),
-    myc_type = slope_tests$myc_type,
-    mycorrhizal_legacy = slope_tests$mycorrhizal_legacy,
-    estimate = slope_tests[[trend_column]],
-    std_error = slope_tests$SE,
-    df = slope_tests$df,
-    statistic = slope_tests$t.ratio,
-    p_value = slope_tests$p.value,
-    conf_low = slope_tests$lower.CL,
-    conf_high = slope_tests$upper.CL,
-    slope_linetype = case_when(
-      slope_tests$p.value < alpha ~ "Significant",
-      TRUE ~ "Not significant"
-    )
-  )
-}
-
-collect_model_stats <- function(model, figure, response, predictor, x_var) {
-  bind_rows(
-    tidy_fixed_effects(model, figure, response, predictor),
-    tidy_type_ii_tests(model, figure, response, predictor),
-    tidy_slope_tests(model, figure, response, predictor, x_var)
-  )
-}
-
-panel_label_data <- function(plot_data, predicted_data) {
-  tibble(
-    mycorrhizal_legacy = c("am", "ecm"),
-    panel_label = c("A", "B"),
-    x = min(plot_data$x, na.rm = TRUE),
-    y = max(predicted_data$upper, na.rm = TRUE)
-  )
-}
-
-model_line_plot <- function(
-    raw_data,
-    predicted_data,
-    x_var,
-    y_var,
-    pred_var,
-    x_label,
-    y_label
-) {
-  label_data <- panel_label_data(
-    tibble(x = raw_data[[x_var]]),
-    predicted_data
-  )
-  
-  ggplot() +
+base_distance_plot <- function(raw_data, response, y_label) {
+  plot <- ggplot() +
     geom_point(
-      data = raw_data,
+      data = filter(
+        raw_data,
+        !is.na(distance_to_edge_m),
+        !is.na(.data[[response]])
+      ),
       aes(
-        x = .data[[x_var]],
-        y = .data[[y_var]],
+        x = distance_to_edge_m,
+        y = .data[[response]],
         color = myc_type,
-        fill = myc_type
-      )
+        shape = mycorrhizal_legacy
+      ),
+      size = 2,
+      alpha = 0.8
+    ) +
+    labs(
+      x = "Distance from forest edge (m)",
+      y = y_label
+    ) +
+    my_theme()
+
+  add_point_scales(plot)
+}
+
+add_tree_prediction_layers <- function(plot, predicted_data) {
+  plot +
+    geom_ribbon(
+      data = filter(predicted_data, myc_type == "am"),
+      aes(
+        x = distance_to_edge_m,
+        ymin = lower.CL,
+        ymax = upper.CL,
+        group = myc_type
+      ),
+      fill = "grey80",
+      alpha = 0.35,
+      inherit.aes = FALSE
     ) +
     geom_line(
       data = predicted_data,
       aes(
-        x = .data[[x_var]],
-        y = .data[[pred_var]],
-        color = factor(myc_type),
-        linetype = slope_linetype
+        x = distance_to_edge_m,
+        y = emmean,
+        color = myc_type,
+        linetype = myc_type,
+        group = myc_type
       ),
-      linewidth = 2
-    ) +
-    geom_ribbon(
-      data = filter(predicted_data, slope_linetype == "Significant"),
-      aes(
-        x = .data[[x_var]],
-        ymin = lower,
-        ymax = upper,
-        fill = factor(myc_type),
-        group = interaction(myc_type, mycorrhizal_legacy)
-      ),
-      alpha = 0.2
-    ) +
-    facet_wrap(
-      ~mycorrhizal_legacy,
-      labeller = as_labeller(c(
-        "am" = "AM legacy plot",
-        "ecm" = "EcM legacy plot"
-      ))
-    ) +
-    labs(
-      y = y_label,
-      x = x_label,
-      color = "Mycorrhizal association",
-      fill = "Mycorrhizal association"
-    ) +
-    scale_color_manual(
-      values = myc_association_colors,
-      limits = names(myc_association_colors),
-      name = "Mycorrhizal association"
-    ) +
-    scale_fill_manual(
-      values = myc_association_colors,
-      limits = names(myc_association_colors),
-      guide = "none"
-    ) +
-    scale_linetype_manual(
-      values = c("Significant" = "solid", "Not significant" = "dashed"),
-      guide = "none"
-    ) +
-    geom_text(
-      data = label_data,
-      aes(x = x, y = y, label = panel_label),
-      hjust = 0,
-      size = 4,
+      linewidth = 1.2,
+      show.legend = FALSE,
       inherit.aes = FALSE
     ) +
-    my_theme()
+    scale_linetype_manual(
+      values = c("am" = "solid", "ecm" = "dashed"),
+      guide = "none"
+    )
 }
 
-# Height change ~ distance to edge  ------------------------------------------------------------
+# Figure 2a: leaf N versus distance ---------------------------------------
 
-# height change
+mod_leafn_distedge <- lmer(
+  leaf_percent_n ~
+    distance_to_edge_m * myc_type * mycorrhizal_legacy +
+    condition + (1 | site_unit) + (1 | species),
+  data = myc_2023
+)
 
-mod_2_alt <-
-  lme4::lmer(height_change ~  
-               leaf_percent_n  * myc_type + 
-               foliar_15n_enrichment * myc_type + 
-               distance_to_edge_m * myc_type * mycorrhizal_legacy +
-               #herbivory +
-               (1 | condition ) + 
-               (1 | site_unit)  + (1 | species) ,
-             data = myc_2023)
+car::Anova(mod_leafn_distedge, type = 2)
+summary(mod_leafn_distedge)
+range(myc_2023$leaf_percent_n)
 
-AIC(mod_2_alt)
-summary(mod_2_alt)
-car::Anova(mod_2_alt)
-plot(resid(mod_2_alt)~ myc_2023$leaf_percent_n)
 
-emmeans::emtrends(mod_2_alt ,~ myc_type * mycorrhizal_legacy, var = "leaf_percent_n")
-emmeans::emtrends(mod_2_alt , ~ myc_type, var = "leaf_percent_n")
+distance_grid <- seq(
+  min(myc_2023$distance_to_edge_m, na.rm = TRUE),
+  max(myc_2023$distance_to_edge_m, na.rm = TRUE),
+  length.out = 100
+)
 
-emmeans::emtrends(mod_2_alt , ~ distance_to_edge_m*myc_type, var = "distance_to_edge_m")
-
-# create predicted dataset
-
-# predicted values for plotting CIs and trend lines 
-
-predicted_data <- expand_grid(
-  distance_to_edge_m = seq(
-    min(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    max(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    length.out = 100
-  ),
-  myc_type = unique(myc_2023$myc_type),
-  mycorrhizal_legacy = unique(myc_2023$mycorrhizal_legacy)
+pred_leafn_distedge <- emmeans::emmeans(
+  mod_leafn_distedge,
+  ~ distance_to_edge_m,
+  at = list(distance_to_edge_m = distance_grid)
 ) %>%
-  mutate(
+  confint() %>%
+  as_tibble()
+
+fig_2a <- base_distance_plot(
+  myc_2023,
+  "leaf_percent_n",
+  "Predicted leaf percent N"
+) +
+  geom_ribbon(
+    data = pred_leafn_distedge,
+    aes(x = distance_to_edge_m, ymin = lower.CL, ymax = upper.CL),
+    fill = "grey80",
+    alpha = 0.35,
+    inherit.aes = FALSE
+  ) +
+  geom_line(
+    data = pred_leafn_distedge,
+    aes(x = distance_to_edge_m, y = emmean),
+    color = "black",
+    linewidth = 1.2,
+    inherit.aes = FALSE
+  )
+
+# Figure 2b: seedling height versus distance ------------------------------
+
+
+mod_height_distedge <- lmer(
+  height_change ~
+    leaf_percent_n +
+    distance_to_edge_m * myc_type * mycorrhizal_legacy +
+    condition + (1 | site_unit) + (1 | species),
+  data = myc_2023
+)
+
+summary (mod_height_distedge)
+car::Anova(mod_height_distedge, type = 2)
+
+pred_height_distedge <- emmeans::emmeans(
+  mod_height_distedge,
+  ~ myc_type | distance_to_edge_m,
+  at = list(
+    distance_to_edge_m = distance_grid,
     leaf_percent_n = mean(myc_2023$leaf_percent_n, na.rm = TRUE),
     foliar_15n_enrichment = mean(
       myc_2023$foliar_15n_enrichment,
       na.rm = TRUE
     )
-  ) %>%
-  mutate(
-    pred_height = predict(mod_2_alt, newdata = ., re.form = NA)
   )
-
-X_pred <- model.matrix(
-  ~  leaf_percent_n * myc_type +
-    foliar_15n_enrichment * myc_type +
-    distance_to_edge_m * myc_type * mycorrhizal_legacy,
-  data = predicted_data
-)
-
-se_preds <- sqrt(
-  diag(X_pred %*% vcov(mod_2_alt) %*% t(X_pred))
-)
-
-predicted_data <- 
-  predicted_data %>%
-  mutate(
-    se = se_preds,
-    lower = pred_height - 1.96 * se,
-    upper = pred_height + 1.96 * se
-  ) %>%
-  add_slope_linetype(
-    model = mod_2_alt,
-    x_var = "distance_to_edge_m"
-  )
-
-# plot
-height_distedge <-
-
-ggplot() +
-geom_point(data = myc_2023,
-           aes(x = distance_to_edge_m,
-               y = height_change,
-           color = myc_type,
-           fill = myc_type ) ) +
-  geom_line(data = predicted_data,
-            aes(
-              x = distance_to_edge_m,
-              y = pred_height,
-              color = factor(myc_type),
-              linetype = slope_linetype),
-              linewidth = 2 ) +
-  geom_ribbon(data = filter(predicted_data, slope_linetype == "Significant"),
-        aes(
-          x = distance_to_edge_m,
-          y = pred_height,
-          ymin = lower, 
-          ymax = upper,
-          fill = factor(myc_type),
-          group = interaction(myc_type, mycorrhizal_legacy)),
-    alpha = 0.2
-  ) + 
-  facet_wrap(
-    ~mycorrhizal_legacy,
-    labeller = as_labeller(c(
-      "am" = "AM legacy plot",
-      "ecm" = "EcM legacy plot"
-    ))
-  ) +
-  labs(
-    y = "Predicted seedling height (cm)",
-    x = "Distance from forest
-    edge (m)",
-    color = "Mycorrhizal association",
-    fill = "Mycorrhizal association"
-  ) +
-  scale_color_manual(
-    values = myc_association_colors,
-    limits = names(myc_association_colors),
-    name = "Mycorrhizal association"
-  ) +
-  scale_fill_manual(
-    values = myc_association_colors,
-    limits = names(myc_association_colors),
-    guide = "none"
-  ) +
-  scale_linetype_manual(
-    values = c("Significant" = "solid", "Not significant" = "dashed"),
-    guide = "none"
-  ) +
-  geom_text(
-    data = tibble(
-      mycorrhizal_legacy = c("am", "ecm"),
-      panel_label = c("A", "B"),
-      x = min(myc_2023$distance_to_edge_m),
-      y = max(predicted_data$upper - 1)
-    ),
-    aes(x = x, y = y, label = panel_label),
-    hjust = 0,
-    size = 4,
-    inherit.aes = FALSE
-  ) +
-  my_theme()
-
-print(height_distedge)
-
-
-# Figure 2: Foliar 15N enrichment ~ distance to edge ----------------------
-
-mod_foliar15n_distedge <-
-  lme4::lmer(
-    foliar_15n_enrichment ~
-      leaf_percent_n +
-      distance_to_edge_m * myc_type * mycorrhizal_legacy +
-      (1 | site_unit) + (1 | species),
-    data = myc_2023
-  )
-
-pred_foliar15n_distedge <- expand_grid(
-  distance_to_edge_m = seq(
-    min(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    max(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    length.out = 100
-  ),
-  myc_type = unique(myc_2023$myc_type),
-  mycorrhizal_legacy = unique(myc_2023$mycorrhizal_legacy)
 ) %>%
-  mutate(
+  confint() %>%
+  as_tibble()
+
+fig_2b <- base_distance_plot(
+  myc_2023,
+  "height_change",
+  "Predicted seedling height (cm)"
+) %>%
+  add_tree_prediction_layers(pred_height_distedge)
+
+# Figure 2c: foliar delta-15N enrichment versus distance ------------------
+mod_foliar15n_distedge <- lmer(
+  foliar_15n_enrichment ~
+    leaf_percent_n +
+    distance_to_edge_m * myc_type * mycorrhizal_legacy +
+    condition + (1 | site_unit) + (1 | species),
+  data = myc_2023
+)
+
+summary (mod_foliar15n_distedge)
+
+car::Anova(mod_foliar15n_distedge, type = 2)
+
+pred_foliar15n_distedge <- emmeans::emmeans(
+  mod_foliar15n_distedge,
+  ~ myc_type | distance_to_edge_m,
+  at = list(
+    distance_to_edge_m = distance_grid,
     leaf_percent_n = mean(myc_2023$leaf_percent_n, na.rm = TRUE)
-  ) %>%
-  add_fixed_effect_ci(
-    model = mod_foliar15n_distedge,
-    fixed_formula = ~ leaf_percent_n +
-      distance_to_edge_m * myc_type * mycorrhizal_legacy,
-    pred_name = "pred_foliar_15n"
-  ) %>%
-  add_slope_linetype(
-    model = mod_foliar15n_distedge,
-    x_var = "distance_to_edge_m"
   )
-
-fig_2_foliar15n_distedge <- model_line_plot(
-  raw_data = myc_2023,
-  predicted_data = pred_foliar15n_distedge,
-  x_var = "distance_to_edge_m",
-  y_var = "foliar_15n_enrichment",
-  pred_var = "pred_foliar_15n",
-  x_label = "Distance from forest edge (m)",
-  y_label = "Predicted foliar 15N enrichment"
-)
-
-print(fig_2_foliar15n_distedge)
-
-
-# Figure 3: Foliar 15N enrichment ~ foliar percent N ----------------------
-
-mod_foliar15n_leafn <-
-  lme4::lmer(
-    foliar_15n_enrichment ~
-      leaf_percent_n * myc_type * mycorrhizal_legacy +
-      distance_to_edge_m +
-      (1 | site_unit) + (1 | species),
-    data = myc_2023
-  )
-
-pred_foliar15n_leafn <- expand_grid(
-  leaf_percent_n = seq(
-    min(myc_2023$leaf_percent_n, na.rm = TRUE),
-    max(myc_2023$leaf_percent_n, na.rm = TRUE),
-    length.out = 100
-  ),
-  myc_type = unique(myc_2023$myc_type),
-  mycorrhizal_legacy = unique(myc_2023$mycorrhizal_legacy)
 ) %>%
-  mutate(
-    distance_to_edge_m = mean(myc_2023$distance_to_edge_m, na.rm = TRUE)
-  ) %>%
-  add_fixed_effect_ci(
-    model = mod_foliar15n_leafn,
-    fixed_formula = ~ leaf_percent_n * myc_type * mycorrhizal_legacy +
-      distance_to_edge_m,
-    pred_name = "pred_foliar_15n"
-  ) %>%
-  add_slope_linetype(
-    model = mod_foliar15n_leafn,
-    x_var = "leaf_percent_n"
-  )
+  confint() %>%
+  as_tibble()
 
-fig_3_foliar15n_leafn <- model_line_plot(
-  raw_data = myc_2023,
-  predicted_data = pred_foliar15n_leafn,
-  x_var = "leaf_percent_n",
-  y_var = "foliar_15n_enrichment",
-  pred_var = "pred_foliar_15n",
-  x_label = "Leaf percent N",
-  y_label = "Predicted foliar 15N enrichment"
-)
-
-print(fig_3_foliar15n_leafn)
-
-
-# Figure 4: Foliar percent N ~ distance to edge ---------------------------
-
-mod_leafn_distedge <-
-  lme4::lmer(
-    leaf_percent_n ~
-      distance_to_edge_m * myc_type * mycorrhizal_legacy +
-      (1 | condition) + (1 | site_unit) + (1 | species),
-    data = myc_2023
-  )
-
-pred_leafn_distedge <- expand_grid(
-  distance_to_edge_m = seq(
-    min(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    max(myc_2023$distance_to_edge_m, na.rm = TRUE),
-    length.out = 100
-  ),
-  myc_type = unique(myc_2023$myc_type),
-  mycorrhizal_legacy = unique(myc_2023$mycorrhizal_legacy)
+fig_2c <- base_distance_plot(
+  myc_2023,
+  "foliar_15n_enrichment",
+  expression(paste("Predicted foliar ", delta^{15}, "N enrichment"))
 ) %>%
-  add_fixed_effect_ci(
-    model = mod_leafn_distedge,
-    fixed_formula = ~ distance_to_edge_m * myc_type * mycorrhizal_legacy,
-    pred_name = "pred_leaf_percent_n"
-  ) %>%
-  add_slope_linetype(
-    model = mod_leafn_distedge,
-    x_var = "distance_to_edge_m"
+  add_tree_prediction_layers(pred_foliar15n_distedge)
+
+## Assemble and save Figure 2 ---------------------------------------------
+
+figure_2_panel_a <- fig_2a + labs(x = NULL)
+figure_2_panel_b <- fig_2b + labs(x = NULL)
+
+figure_2 <- patchwork::wrap_plots(
+  figure_2_panel_a,
+  figure_2_panel_b,
+  fig_2c,
+  ncol = 1,
+  guides = "collect"
+) +
+  patchwork::plot_annotation(tag_levels = "A") &
+  theme(
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    legend.title = element_text(size = 11),
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.box.just = "center",
+    plot.tag = element_text(size = 14, face = "bold")
   )
 
-fig_4_leafn_distedge <- model_line_plot(
-  raw_data = myc_2023,
-  predicted_data = pred_leafn_distedge,
-  x_var = "distance_to_edge_m",
-  y_var = "leaf_percent_n",
-  pred_var = "pred_leaf_percent_n",
-  x_label = "Distance from forest edge (m)",
-  y_label = "Predicted leaf percent N"
+dir.create("outplut/figures", showWarnings = FALSE, recursive = TRUE)
+
+figure_2_parts <- list(
+  "figure_2a_leaf_n_vs_distance_to_edge.png" = fig_2a,
+  "figure_2b_seedling_height_vs_distance_to_edge.png" = fig_2b,
+  "figure_2c_foliar_15n_vs_distance_to_edge.png" = fig_2c
 )
 
-print(fig_4_leafn_distedge)
+iwalk(
+  figure_2_parts,
+  ~ ggsave(
+    filename = file.path("outplut/figures", .y),
+    plot = .x,
+    width = 7,
+    height = 5.5,
+    dpi = 300,
+    bg = "white"
+  )
+)
 
+ggsave(
+  "outplut/figures/figure_2.png",
+  figure_2,
+  width = 7,
+  height = 14,
+  dpi = 300,
+  bg = "white"
+)
 
-# Figure 5: Height change ~ foliar percent N ------------------------------
+ggsave(
+  "outplut/figures/figure_2_editable.pdf",
+  figure_2,
+  width = 7,
+  height = 14,
+  device = "pdf",
+  bg = "white"
+)
 
-pred_height_leafn <- expand_grid(
-  leaf_percent_n = seq(
-    min(myc_2023$leaf_percent_n, na.rm = TRUE),
-    max(myc_2023$leaf_percent_n, na.rm = TRUE),
-    length.out = 100
-  ),
-  myc_type = unique(myc_2023$myc_type),
-  mycorrhizal_legacy = unique(myc_2023$mycorrhizal_legacy)
+ggsave(
+  "outplut/figures/figure_2_editable.svg",
+  figure_2,
+  width = 7,
+  height = 14,
+  device = svglite::svglite,
+  bg = "white"
+)
+
+# Figure S1: soil responses ----------------------------------------------
+
+soil_data <- myc_2023 %>%
+  filter(
+    !is.na(distance_to_edge_m),
+    !is.na(myc_type),
+    !is.na(mycorrhizal_legacy)
+  )
+
+soil_scatter_plot <- function(data, response, y_label, y_limits) {
+  ggplot(
+    filter(data, !is.na(.data[[response]])),
+    aes(
+      x = distance_to_edge_m,
+      y = .data[[response]],
+      shape = mycorrhizal_legacy
+    )
+  ) +
+    geom_point(size = 2, alpha = 0.8, color = "black") +
+    scale_y_continuous(limits = y_limits) +
+    scale_shape_manual(
+      values = legacy_shapes,
+      breaks = names(legacy_labels),
+      labels = legacy_labels,
+      name = "Mycorrhizal legacy"
+    ) +
+    labs(
+      x = "Distance from forest edge (m)",
+      y = y_label
+    ) +
+    my_theme()
+}
+
+soil_mean_plot <- function(predicted_data, y_label, y_limits) {
+  ggplot(
+    predicted_data,
+    aes(
+      x = mycorrhizal_legacy,
+      y = emmean,
+      shape = mycorrhizal_legacy
+    )
+  ) +
+    geom_errorbar(
+      aes(ymin = lower.CL, ymax = upper.CL),
+      width = 0.12,
+      linewidth = 0.6,
+      color = "black"
+    ) +
+    geom_point(size = 1.7, color = "black") +
+    scale_y_continuous(limits = y_limits) +
+    scale_x_discrete(labels = legacy_labels) +
+    scale_shape_manual(values = legacy_shapes, guide = "none") +
+    labs(x = NULL, y = y_label) +
+    my_theme() +
+    theme(legend.position = "none")
+}
+
+mod_soil_n <- lmer(
+  soil_percent_n ~
+    distance_to_edge_m * mycorrhizal_legacy +
+    (1 | site_unit),
+  data = soil_data
+)
+summary (mod_soil_n)
+car:: Anova(mod_soil_n, type = 2)
+
+mod_soil_cn <- lmer(
+  soil_cn_ratio ~
+    distance_to_edge_m * mycorrhizal_legacy +
+    (1 | site_unit),
+  data = soil_data
+)
+summary (mod_soil_cn)
+car:: Anova(mod_soil_cn, type = 2)
+
+emmeans::emtrends (
+  mod_soil_cn,
+  ~ mycorrhizal_legacy*distance_to_edge_m,
+  var = "distance_to_edge_m"
+)
+
+mean_soil_distance <- mean(soil_data$distance_to_edge_m, na.rm = TRUE)
+
+soil_n_predictions <- emmeans::emmeans(
+  mod_soil_n,
+  ~ mycorrhizal_legacy,
+  at = list(distance_to_edge_m = mean_soil_distance)
 ) %>%
-  mutate(
-    foliar_15n_enrichment = mean(myc_2023$foliar_15n_enrichment, na.rm = TRUE),
-    distance_to_edge_m = mean(myc_2023$distance_to_edge_m, na.rm = TRUE)
+  confint() %>%
+  as_tibble()
+
+soil_cn_predictions <- emmeans::emmeans(
+  mod_soil_cn,
+  ~ mycorrhizal_legacy,
+  at = list(distance_to_edge_m = mean_soil_distance)
+) %>%
+  confint() %>%
+  as_tibble()
+soil_cn_predictions
+
+# Pairwise legacy contrasts evaluated at the mean observed distance, matching
+# the estimated marginal means displayed in the right-hand panels.
+soil_n_legacy_contrast <- emmeans::emmeans(
+  mod_soil_n,
+  ~ mycorrhizal_legacy,
+  at = list(distance_to_edge_m = mean_soil_distance)
+) %>%
+  pairs() %>%
+  summary(infer = c(TRUE, TRUE)) %>%
+  as_tibble()
+
+soil_cn_legacy_contrast <- emmeans::emmeans(
+  mod_soil_cn,
+  ~ mycorrhizal_legacy,
+  at = list(distance_to_edge_m = mean_soil_distance)
+) %>%
+  pairs() %>%
+  summary(infer = c(TRUE, TRUE)) %>%
+  as_tibble()
+
+soil_n_limits <- range(
+  soil_data$soil_percent_n,
+  soil_n_predictions$lower.CL,
+  soil_n_predictions$upper.CL,
+  na.rm = TRUE
+)
+
+soil_cn_limits <- range(
+  soil_data$soil_cn_ratio,
+  soil_cn_predictions$lower.CL,
+  soil_cn_predictions$upper.CL,
+  na.rm = TRUE
+)
+
+fig_s1a <- soil_scatter_plot(
+  soil_data,
+  "soil_percent_n",
+  "Soil N (%)",
+  soil_n_limits
+)
+
+fig_s1b <- soil_mean_plot(
+  soil_n_predictions,
+  "Mean soil N (%)",
+  soil_n_limits
+)
+
+fig_s1c <- soil_scatter_plot(
+  soil_data,
+  "soil_cn_ratio",
+  "Soil C:N ratio",
+  soil_cn_limits
+)
+
+fig_s1d <- soil_mean_plot(
+  soil_cn_predictions,
+  "Mean soil C:N ratio",
+  soil_cn_limits
+)
+
+figure_s1 <- patchwork::wrap_plots(
+  fig_s1a,
+  fig_s1b,
+  fig_s1c,
+  fig_s1d,
+  design = "AB\nCD",
+  widths = c(3, 1),
+  guides = "collect"
+) +
+  patchwork::plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom")
+
+ggsave(
+  "outplut/figures/figure_s1_soil_n_and_cn_ratio.png",
+  figure_s1,
+  width = 10,
+  height = 8,
+  dpi = 300,
+  bg = "white"
+)
+
+# Supplemental table for all model results -------------------------------
+
+dir.create("outplut/tables", showWarnings = FALSE, recursive = TRUE)
+
+table_models <- list(
+  "Leaf N (%)" = mod_leafn_distedge,
+  "Height change (cm)" = mod_height_distedge,
+  "Foliar δ15N enrichment (‰)" = mod_foliar15n_distedge,
+  "Soil N (%)" = mod_soil_n,
+  "Soil C:N ratio" = mod_soil_cn
+)
+
+variable_labels <- c(
+  "distance_to_edge_m" = "Distance to edge",
+  "myc_type" = "Tree mycorrhizal type",
+  "mycorrhizal_legacy" = "Mycorrhizal legacy",
+  "leaf_percent_n" = "Leaf N",
+  "condition" = "Condition"
+)
+
+format_p <- function(p) {
+  ifelse(p < 0.001, "< 0.001", formatC(p, format = "f", digits = 3))
+}
+
+# Make the table
+table_models %>%
+
+  # Type II Wald chi-square tests for each model
+  purrr::imap_dfr(~ {
+    car::Anova(.x, type = 2) %>%
+      broom::tidy() %>%
+      mutate(
+        Model = .y,
+        Variable = term %>%
+          str_split(":") %>%
+          map_chr(~ paste(variable_labels[.x], collapse = " * ")),
+        `p value` = format_p(p.value),
+        Chisq = round(statistic, 2)
+      ) %>%
+      select(Model, Variable, Chisq, Df = df, `p value`)
+  }) %>%
+
+  # Format for table display
+  group_by(Model) %>%
+  mutate(Model = if_else(row_number() == 1, Model, "")) %>%
+  ungroup() %>%
+
+  # Make the flextable
+  flextable::flextable() %>%
+  flextable::set_header_labels(
+    Model = "Model",
+    Variable = "Variable",
+    Chisq = "Chi-square",
+    Df = "Df",
+    `p value` = "p value"
   ) %>%
-  add_fixed_effect_ci(
-    model = mod_2_alt,
-    fixed_formula = ~ leaf_percent_n * myc_type +
-      foliar_15n_enrichment * myc_type +
-      distance_to_edge_m * myc_type * mycorrhizal_legacy,
-    pred_name = "pred_height"
-  ) %>%
-  add_slope_linetype(
-    model = mod_2_alt,
-    x_var = "leaf_percent_n"
-  )
-
-fig_5_height_leafn <- model_line_plot(
-  raw_data = myc_2023,
-  predicted_data = pred_height_leafn,
-  x_var = "leaf_percent_n",
-  y_var = "height_change",
-  pred_var = "pred_height",
-  x_label = "Leaf percent N",
-  y_label = "Predicted seedling height (cm)"
-)
-
-print(fig_5_height_leafn)
+  flextable::theme_vanilla() %>%
+  flextable::bold(part = "header") %>%
+  flextable::align(align = "center", part = "all") %>%
+  flextable::autofit() %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+  flextable::save_as_docx(path = "outplut/tables/model_results_10122026.docx")
 
 
-# Export model statistics -------------------------------------------------
+# table for emtrends results
 
-final_figure_model_stats <- bind_rows(
-  collect_model_stats(
-    model = mod_2_alt,
-    figure = "Height change ~ distance to edge",
-    response = "height_change",
-    predictor = "distance_to_edge_m",
-    x_var = "distance_to_edge_m"
-  ),
-  collect_model_stats(
-    model = mod_foliar15n_distedge,
-    figure = "Figure 2",
-    response = "foliar_15n_enrichment",
-    predictor = "distance_to_edge_m",
-    x_var = "distance_to_edge_m"
-  ),
-  collect_model_stats(
-    model = mod_foliar15n_leafn,
-    figure = "Figure 3",
-    response = "foliar_15n_enrichment",
-    predictor = "leaf_percent_n",
-    x_var = "leaf_percent_n"
-  ),
-  collect_model_stats(
-    model = mod_leafn_distedge,
-    figure = "Figure 4",
-    response = "leaf_percent_n",
-    predictor = "distance_to_edge_m",
-    x_var = "distance_to_edge_m"
-  ),
-  collect_model_stats(
-    model = mod_2_alt,
-    figure = "Figure 5",
-    response = "height_change",
-    predictor = "leaf_percent_n",
-    x_var = "leaf_percent_n"
-  )
-)
+# Distance slopes for each tree type x legacy group (soil models: by legacy).
+# p value tests whether each slope differs from zero.
+table_models %>%
 
-dir.create("outplut", showWarnings = FALSE, recursive = TRUE)
-write_csv(
-  final_figure_model_stats,
-  "outplut/final_figure_model_stats.csv"
-)
+  purrr::imap_dfr(~ {
+    trend_specs <- if ("myc_type" %in% all.vars(formula(.x))) {
+      ~ myc_type * mycorrhizal_legacy
+    } else {
+      ~ mycorrhizal_legacy
+    }
+
+    emmeans::emtrends(.x, specs = trend_specs, var = "distance_to_edge_m") %>%
+      summary(infer = c(TRUE, TRUE)) %>%
+      as.data.frame() %>%
+      mutate(
+        Model = .y,
+        `Tree mycorrhizal type` = if ("myc_type" %in% names(.)) {
+          myc_type_labels[as.character(myc_type)]
+        } else {
+          ""
+        },
+        `Mycorrhizal legacy` = legacy_labels[as.character(mycorrhizal_legacy)],
+        Estimate = round(distance_to_edge_m.trend, 3),
+        `Standard error` = round(SE, 3),
+        df = round(df, 1),
+        `p value` = format_p(p.value)
+      ) %>%
+      select(
+        Model, `Tree mycorrhizal type`, `Mycorrhizal legacy`,
+        Estimate, `Standard error`, df, `p value`
+      )
+  }) %>%
+
+  dplyr::group_by(Model) %>%
+  dplyr::mutate(Model = ifelse(dplyr::row_number() == 1, Model, "")) %>%
+  dplyr::ungroup() %>%
+
+  # make the table
+
+  flextable::flextable() %>%
+  flextable::theme_vanilla() %>%
+  flextable::bold(part = "header") %>%
+  flextable::align(align = "center", part = "all") %>%
+  flextable::autofit() %>%
+  flextable::font(fontname = "Times New Roman", part = "all") %>%
+  flextable::fontsize(size = 12, part = "all") %>%
+
+  # Export to Word file
+  flextable::save_as_docx(path = "outplut/tables/emtrends_results_10122026.docx")

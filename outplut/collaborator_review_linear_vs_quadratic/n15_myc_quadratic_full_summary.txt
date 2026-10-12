@@ -1,0 +1,72 @@
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+  method [lmerModLmerTest]
+Formula: foliar_15n_enrichment ~ dist_c * myc_type * mycorrhizal_legacy +  
+    dist_c2 * myc_type + (1 | condition) + (1 | site_unit) +      (1 | species)
+   Data: n15_dat
+Control: fit_control
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    685.3     729.3    -328.7     657.3       157 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.1820 -0.6814 -0.1258  0.6470  3.0382 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.08577  0.2929  
+ species   (Intercept) 0.31448  0.5608  
+ condition (Intercept) 0.00000  0.0000  
+ Residual              2.52484  1.5890  
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                           Estimate Std. Error         df
+(Intercept)                               -4.735694   0.429006  15.079355
+dist_c                                     0.156240   0.055574 157.594700
+myc_typeecm                                1.280169   0.587048  12.975398
+mycorrhizal_legacyecm                      1.825423   0.401120  15.233243
+dist_c2                                   -0.006671   0.010802 166.117597
+dist_c:myc_typeecm                        -0.235223   0.096456 163.152370
+dist_c:mycorrhizal_legacyecm               0.110466   0.086641 158.936535
+myc_typeecm:mycorrhizal_legacyecm         -0.053772   0.506659 156.227500
+myc_typeecm:dist_c2                       -0.015363   0.014578 164.864691
+dist_c:myc_typeecm:mycorrhizal_legacyecm   0.021910   0.132772 164.693523
+                                         t value Pr(>|t|)    
+(Intercept)                              -11.039 1.27e-08 ***
+dist_c                                     2.811 0.005560 ** 
+myc_typeecm                                2.181 0.048212 *  
+mycorrhizal_legacyecm                      4.551 0.000368 ***
+dist_c2                                   -0.618 0.537721    
+dist_c:myc_typeecm                        -2.439 0.015814 *  
+dist_c:mycorrhizal_legacyecm               1.275 0.204174    
+myc_typeecm:mycorrhizal_legacyecm         -0.106 0.915615    
+myc_typeecm:dist_c2                       -1.054 0.293511    
+dist_c:myc_typeecm:mycorrhizal_legacyecm   0.165 0.869131    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) dist_c myc_ty mycrr_ dst_c2 dst_c:myc_t dst_c:mycr_ myc_:_
+dist_c       0.082                                                           
+myc_typeecm -0.646 -0.059                                                    
+mycrrhzl_lg -0.440 -0.100  0.232                                             
+dist_c2     -0.419  0.029  0.305  0.049                                      
+dst_c:myc_t -0.044 -0.575  0.050  0.058 -0.026                               
+dst_c:mycr_  0.034 -0.652 -0.025 -0.082 -0.230  0.377                        
+myc_typcm:_  0.250  0.080 -0.375 -0.579 -0.038 -0.103       0.064            
+myc_typc:_2  0.311 -0.024 -0.351 -0.040 -0.742  0.079       0.172      -0.074
+dst_c:my_:_ -0.028  0.425  0.017  0.050  0.164 -0.738      -0.653       0.011
+            my_:_2
+dist_c            
+myc_typeecm       
+mycrrhzl_lg       
+dist_c2           
+dst_c:myc_t       
+dst_c:mycr_       
+myc_typcm:_       
+myc_typc:_2       
+dst_c:my_:_ -0.200
+optimizer (bobyqa) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')
+

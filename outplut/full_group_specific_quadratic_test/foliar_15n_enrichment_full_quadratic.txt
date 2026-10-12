@@ -1,0 +1,35 @@
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: foliar_15n_enrichment ~ leaf_percent_n + (dist_c + dist_c2) *  
+    myc_type * mycorrhizal_legacy + (1 | site_unit) + (1 | species)
+   Data: d
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    687.3     737.5    -327.6     655.3       155 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.2008 -0.6472 -0.1182  0.6440  3.0396 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.09339  0.3056  
+ species   (Intercept) 0.35783  0.5982  
+ Residual              2.47858  1.5743  
+Number of obs: 171, groups:  site_unit, 8; species, 7
+
+Fixed effects:
+                                           Estimate Std. Error t value
+(Intercept)                               -5.210153   0.730975  -7.128
+leaf_percent_n                             0.222751   0.292885   0.761
+dist_c                                     0.151221   0.055491   2.725
+dist_c2                                   -0.003498   0.013099  -0.267
+myc_typeecm                                1.081665   0.642261   1.684
+mycorrhizal_legacyecm                      2.016332   0.537147   3.754
+dist_c:myc_typeecm                        -0.221485   0.096335  -2.299
+dist_c2:myc_typeecm                       -0.002240   0.020564  -0.109
+dist_c:mycorrhizal_legacyecm               0.124879   0.089304   1.398
+dist_c2:mycorrhizal_legacyecm             -0.009397   0.022535  -0.417
+myc_typeecm:mycorrhizal_legacyecm          0.138803   0.673923   0.206
+dist_c:myc_typeecm:mycorrhizal_legacyecm  -0.004925   0.134563  -0.037
+dist_c2:myc_typeecm:mycorrhizal_legacyecm -0.016436   0.030234  -0.544

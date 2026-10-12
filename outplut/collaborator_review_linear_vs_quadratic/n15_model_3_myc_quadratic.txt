@@ -1,0 +1,43 @@
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+  method [lmerModLmerTest]
+Formula: foliar_15n_enrichment ~ leaf_percent_n + mycorrhizal_legacy +  
+    (dist_c + dist_c2) * myc_type + (1 | site_unit) + (1 | species)
+   Data: n15_dat
+Control: fit_control
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    682.5     717.0    -330.2     660.5       160 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.1228 -0.7058 -0.1051  0.5574  3.0166 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.1028   0.3207  
+ species   (Intercept) 0.3603   0.6003  
+ Residual              2.5537   1.5980  
+Number of obs: 171, groups:  site_unit, 8; species, 7
+
+Fixed effects:
+                        Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)            -4.990222   0.705862  47.592080  -7.070 6.01e-09 ***
+leaf_percent_n          0.144984   0.291562 148.449797   0.497  0.61974    
+mycorrhizal_legacyecm   1.824563   0.342618   7.164665   5.325  0.00101 ** 
+dist_c                  0.202188   0.042043 157.304710   4.809 3.52e-06 ***
+dist_c2                -0.003821   0.010613 165.266685  -0.360  0.71930    
+myc_typeecm             1.181104   0.578465   8.995599   2.042  0.07157 .  
+dist_c:myc_typeecm     -0.205339   0.064008 163.714585  -3.208  0.00161 ** 
+dist_c2:myc_typeecm    -0.016570   0.014322 163.523451  -1.157  0.24898    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) lf_pr_ mycrr_ dist_c dst_c2 myc_ty dst_:_
+lef_prcnt_n -0.788                                          
+mycrrhzl_lg -0.322  0.119                                   
+dist_c       0.137 -0.098 -0.141                            
+dist_c2     -0.314  0.076  0.028 -0.168                     
+myc_typeecm -0.231 -0.177 -0.005 -0.023  0.291              
+dst_c:myc_t  0.034 -0.092  0.058 -0.635  0.104  0.061       
+dst_c2:myc_  0.229 -0.033 -0.090  0.136 -0.740 -0.387 -0.103

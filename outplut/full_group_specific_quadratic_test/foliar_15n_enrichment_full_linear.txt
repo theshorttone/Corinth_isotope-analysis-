@@ -1,0 +1,42 @@
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: foliar_15n_enrichment ~ leaf_percent_n + dist_c * myc_type *  
+    mycorrhizal_legacy + (1 | site_unit) + (1 | species)
+   Data: d
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    686.2     723.9    -331.1     662.2       159 
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.14413 -0.63415 -0.09102  0.62927  3.13657 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.06035  0.2457  
+ species   (Intercept) 0.34574  0.5880  
+ Residual              2.60898  1.6152  
+Number of obs: 171, groups:  site_unit, 8; species, 7
+
+Fixed effects:
+                                           Estimate Std. Error t value
+(Intercept)                              -5.2517572  0.6805214  -7.717
+leaf_percent_n                            0.2109592  0.2924469   0.721
+dist_c                                    0.1534902  0.0568535   2.700
+myc_typeecm                               1.0869923  0.5748795   1.891
+mycorrhizal_legacyecm                     1.8752209  0.3940583   4.759
+dist_c:myc_typeecm                       -0.2209504  0.0971478  -2.274
+dist_c:mycorrhizal_legacyecm              0.1016584  0.0858905   1.184
+myc_typeecm:mycorrhizal_legacyecm        -0.2715974  0.5102691  -0.532
+dist_c:myc_typeecm:mycorrhizal_legacyecm -0.0008408  0.1320702  -0.006
+
+Correlation of Fixed Effects:
+            (Intr) lf_pr_ dist_c myc_ty mycrr_ dst_c:myc_t dst_c:mycr_ myc_:_
+lef_prcnt_n -0.816                                                           
+dist_c       0.159 -0.121                                                    
+myc_typeecm -0.232 -0.153 -0.053                                             
+mycrrhzl_lg -0.377  0.154 -0.123  0.208                                      
+dst_c:myc_t -0.031 -0.005 -0.575  0.078  0.062                               
+dst_c:mycr_ -0.097  0.068 -0.665  0.038 -0.064  0.384                        
+myc_typcm:_  0.218 -0.082  0.091 -0.397 -0.616 -0.091       0.051            
+dst_c:my_:_  0.092 -0.079  0.436 -0.046  0.033 -0.738      -0.650       0.005

@@ -1,0 +1,62 @@
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: height_change ~ leaf_percent_n * myc_type + foliar_15n_enrichment *  
+    myc_type + dist_c * myc_type * mycorrhizal_legacy + (1 |  
+    condition) + (1 | site_unit) + (1 | species)
+   Data: d
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   1831.3    1881.6    -899.7    1799.3       155 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.8257 -0.5689 -0.0600  0.3977  4.2002 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept)  192.3   13.87   
+ species   (Intercept) 1422.9   37.72   
+ condition (Intercept)  488.7   22.11   
+ Residual              1805.7   42.49   
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                         Estimate Std. Error t value
+(Intercept)                               39.4884    40.0470   0.986
+leaf_percent_n                             5.1727    13.1344   0.394
+myc_typeecm                              -44.7144    49.8895  -0.896
+foliar_15n_enrichment                     -3.0594     2.7323  -1.120
+dist_c                                     2.9420     1.5789   1.863
+mycorrhizal_legacyecm                     -7.6016    14.6393  -0.519
+leaf_percent_n:myc_typeecm                20.6739    16.5957   1.246
+myc_typeecm:foliar_15n_enrichment          0.5625     4.2564   0.132
+myc_typeecm:dist_c                        -1.2900     2.6763  -0.482
+dist_c:mycorrhizal_legacyecm               1.4961     2.2935   0.652
+myc_typeecm:mycorrhizal_legacyecm        -15.4696    15.4738  -1.000
+myc_typeecm:dist_c:mycorrhizal_legacyecm  -2.4327     3.6203  -0.672
+
+Correlation of Fixed Effects:
+             (Intr) lf_pr_ myc_ty fl_15_ dist_c mycrr_ lf__:_ m_:_15
+lef_prcnt_n  -0.662                                                 
+myc_typeecm  -0.576  0.475                                          
+flr_15n_nrc   0.347 -0.029 -0.287                                   
+dist_c        0.051 -0.179 -0.032 -0.274                            
+mycrrhzl_lg  -0.391  0.193  0.232 -0.346 -0.009                     
+lf_prcnt_:_   0.472 -0.749 -0.707  0.030  0.140 -0.145              
+myc_ty:_15_  -0.203  0.012  0.431 -0.648  0.187  0.222 -0.104       
+myc_typcm:d_  0.005  0.068  0.077  0.167 -0.582 -0.003 -0.119 -0.053
+dst_c:mycr_  -0.095  0.084  0.098 -0.111 -0.603 -0.003 -0.082  0.075
+myc_typcm:m_  0.267 -0.170 -0.407  0.326  0.004 -0.515  0.198 -0.468
+myc_typ:_:_   0.011  0.007 -0.063  0.096  0.360  0.003 -0.008 -0.144
+             myc_typcm:d_ dst_:_ myc_typcm:m_
+lef_prcnt_n                                  
+myc_typeecm                                  
+flr_15n_nrc                                  
+dist_c                                       
+mycrrhzl_lg                                  
+lf_prcnt_:_                                  
+myc_ty:_15_                                  
+myc_typcm:d_                                 
+dst_c:mycr_   0.357                          
+myc_typcm:m_ -0.066       -0.003             
+myc_typ:_:_  -0.702       -0.634  0.067      

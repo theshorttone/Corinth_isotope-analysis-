@@ -1,0 +1,47 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 673.5
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.08658 -0.67816 -0.07854  0.61171  3.00348 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.1306   0.3614  
+ species   (Intercept) 0.5643   0.7512  
+ Residual              2.6895   1.6400  
+Number of obs: 171, groups:  site_unit, 8; species, 7
+
+Fixed effects:
+                                   Estimate Std. Error        df t value
+(Intercept)                        -5.24623    0.74852  30.45099  -7.009
+leaf_percent_n                      0.22824    0.30452 145.90358   0.750
+myc_typeecm                         1.06273    0.67962   6.04611   1.564
+mycorrhizal_legacyecm               1.90618    0.44044  12.16343   4.328
+dist_c                              0.19588    0.04316 154.62116   4.539
+myc_typeecm:mycorrhizal_legacyecm  -0.32002    0.51724 154.35116  -0.619
+myc_typeecm:dist_c                 -0.20500    0.06589 158.45997  -3.111
+                                  Pr(>|t|)    
+(Intercept)                       7.97e-08 ***
+leaf_percent_n                    0.454757    
+myc_typeecm                       0.168543    
+mycorrhizal_legacyecm             0.000953 ***
+dist_c                            1.13e-05 ***
+myc_typeecm:mycorrhizal_legacyecm 0.537028    
+myc_typeecm:dist_c                0.002211 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) lf_pr_ myc_ty mycrr_ dist_c myc_typcm:m_
+lef_prcnt_n  -0.770                                         
+myc_typeecm  -0.277 -0.139                                  
+mycrrhzl_lg  -0.375  0.142  0.164                           
+dist_c        0.119 -0.101 -0.030 -0.201                    
+myc_typcm:m_  0.207 -0.084 -0.342 -0.559  0.167             
+myc_typcm:d_  0.041 -0.087  0.058  0.106 -0.634 -0.118      

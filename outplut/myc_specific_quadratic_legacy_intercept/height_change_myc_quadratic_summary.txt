@@ -1,0 +1,47 @@
+Linear mixed model fit by REML ['lmerMod']
+Formula: height_change ~ leaf_percent_n * myc_type + foliar_15n_enrichment *  
+    myc_type + mycorrhizal_legacy + (dist_c + dist_c2) * myc_type +  
+    (1 | condition) + (1 | site_unit) + (1 | species)
+   Data: data
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 1749.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.0307 -0.5225 -0.0280  0.4461  4.0737 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept)  243.9   15.62   
+ species   (Intercept) 1940.1   44.05   
+ condition (Intercept)  754.0   27.46   
+ Residual              1875.8   43.31   
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                  Estimate Std. Error t value
+(Intercept)                        56.4694    42.7447   1.321
+leaf_percent_n                      0.6904    13.2702   0.052
+myc_typeecm                       -63.9300    49.9471  -1.280
+foliar_15n_enrichment              -2.3615     2.6388  -0.895
+mycorrhizal_legacyecm             -12.5438    13.6921  -0.916
+dist_c                              3.7245     1.3051   2.854
+dist_c2                            -0.1786     0.2940  -0.608
+leaf_percent_n:myc_typeecm         24.3241    16.6215   1.463
+myc_typeecm:foliar_15n_enrichment  -2.1139     3.8193  -0.553
+myc_typeecm:dist_c                 -2.5923     1.9394  -1.337
+myc_typeecm:dist_c2                -0.2768     0.4046  -0.684
+
+Correlation of Fixed Effects:
+            (Intr) lf_pr_ myc_ty fl_15_ mycrr_ dist_c dst_c2 lf__:_ m_:_15 myc_:_
+lef_prcnt_n -0.606                                                               
+myc_typeecm -0.520  0.424                                                        
+flr_15n_nrc  0.248  0.041 -0.158                                                 
+mycrrhzl_lg -0.282  0.114  0.037 -0.217                                          
+dist_c       0.014 -0.175  0.015 -0.460 -0.008                                   
+dist_c2     -0.137  0.097  0.139  0.066  0.001 -0.178                            
+lf_prcnt_:_  0.410 -0.737 -0.663 -0.044 -0.051  0.123 -0.084                     
+myc_ty:_15_ -0.081 -0.077  0.264 -0.584 -0.025  0.329 -0.032 -0.012              
+myc_typcm:_ -0.014  0.134  0.068  0.354 -0.011 -0.691  0.124 -0.204 -0.268       
+myc_typc:_2  0.101 -0.067 -0.181  0.008 -0.074  0.113 -0.737  0.104  0.065 -0.092

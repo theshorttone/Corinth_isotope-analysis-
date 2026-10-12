@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 .positai
+
+# OS / Office / R scratch files
+.DS_Store
+Rplots.pdf
+~$*
+*.inspect.ndjson

@@ -1,0 +1,56 @@
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+  method [lmerModLmerTest]
+Formula: height_change ~ dist_c * myc_type * mycorrhizal_legacy + dist_c2 +  
+    (1 | condition) + (1 | site_unit) + (1 | species)
+   Data: height_dat
+Control: fit_control
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+   1829.2    1870.0    -901.6    1803.2       158 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.9274 -0.5572 -0.0529  0.4990  4.1079 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept)  210.9   14.52   
+ species   (Intercept) 1684.6   41.04   
+ condition (Intercept)  205.8   14.35   
+ Residual              1843.8   42.94   
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                                         Estimate Std. Error       df t value
+(Intercept)                               77.0874    25.6875   7.8681   3.001
+dist_c                                     2.4683     1.5051 156.4474   1.640
+myc_typeecm                               -5.3436    32.7078   7.2434  -0.163
+mycorrhizal_legacyecm                    -15.0987    13.8733  11.4106  -1.088
+dist_c2                                   -0.3254     0.1979 160.1728  -1.644
+dist_c:myc_typeecm                        -0.3306     2.6445 162.4701  -0.125
+dist_c:mycorrhizal_legacyecm               1.9955     2.3231 157.4793   0.859
+myc_typeecm:mycorrhizal_legacyecm        -11.3718    13.6806 155.6519  -0.831
+dist_c:myc_typeecm:mycorrhizal_legacyecm  -2.6080     3.6142 163.9500  -0.722
+                                         Pr(>|t|)  
+(Intercept)                                0.0174 *
+dist_c                                     0.1030  
+myc_typeecm                                0.8747  
+mycorrhizal_legacyecm                      0.2989  
+dist_c2                                    0.1021  
+dist_c:myc_typeecm                         0.9007  
+dist_c:mycorrhizal_legacyecm               0.3917  
+myc_typeecm:mycorrhizal_legacyecm          0.4071  
+dist_c:myc_typeecm:mycorrhizal_legacyecm   0.4716  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) dist_c myc_ty mycrr_ dst_c2 dst_c:myc_t dst_c:mycr_ myc_:_
+dist_c       0.038                                                           
+myc_typeecm -0.552 -0.032                                                    
+mycrrhzl_lg -0.264 -0.078  0.083                                             
+dist_c2     -0.140  0.017  0.033  0.020                                      
+dst_c:myc_t -0.024 -0.565  0.038  0.047  0.041                               
+dst_c:mycr_  0.010 -0.656  0.017 -0.062 -0.160  0.367                        
+myc_typcm:_  0.125  0.078 -0.195 -0.458 -0.136 -0.099       0.077            
+dst_c:my_:_ -0.020  0.419 -0.025  0.036  0.042 -0.736      -0.634      -0.003

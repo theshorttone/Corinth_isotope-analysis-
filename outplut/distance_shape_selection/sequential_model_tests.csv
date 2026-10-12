@@ -1,0 +1,13 @@
+response,question,null_model,alternative_model,chisq,df,p_value,AIC_null,AIC_alternative,delta_AIC_alternative_minus_null
+height_change,Does a common quadratic term improve on a common linear response?,common_linear,common_quadratic,2.1024244234706657,1,0.1470657867862614,1827.5371657054748,1827.434741282004,-0.10242442347066572
+height_change,Does the selected common linear distance response improve a model without distance?,no_distance,common_linear,6.743220313696611,1,0.009410460334108691,1832.2803860191714,1827.5371657054748,-4.743220313696611
+height_change,Does the selected linear response differ by myc type?,common_linear,linear_by_myc,1.6788569765287775,1,0.19507640269158177,1827.5371657054748,1827.858308728946,0.3211430234712225
+height_change,Does the selected linear response differ by legacy?,common_linear,linear_by_legacy,0.007751013020651953,1,0.9298450131575079,1827.5371657054748,1829.529414692454,1.992248986979348
+foliar_15n_enrichment,Does a common quadratic term improve on a common linear response?,common_linear,common_quadratic,2.129018163759497,1,0.14453330933532163,691.9964182291055,691.867400065346,-0.12901816375949693
+foliar_15n_enrichment,Does the selected common linear distance response improve a model without distance?,no_distance,common_linear,10.736307798101166,1,0.0010505373142423488,700.7327260272067,691.9964182291055,-8.736307798101166
+foliar_15n_enrichment,Does the selected linear response differ by myc type?,common_linear,linear_by_myc,9.439093989388539,1,0.0021240839939293934,691.9964182291055,684.557324239717,-7.439093989388539
+foliar_15n_enrichment,Does the selected linear response differ by legacy?,common_linear,linear_by_legacy,0.8195124192531011,1,0.36532276154398674,691.9964182291055,693.1769058098524,1.1804875807468989
+leaf_percent_n,Does a common quadratic term improve on a common linear response?,common_linear,common_quadratic,2.6463653018866182,1,0.10378695657889467,201.45236945601616,200.80600415412954,-0.6463653018866182
+leaf_percent_n,Does the selected common linear distance response improve a model without distance?,no_distance,common_linear,6.791294730105761,1,0.009160344800035537,206.24366418612192,201.45236945601616,-4.791294730105761
+leaf_percent_n,Does the selected linear response differ by myc type?,common_linear,linear_by_myc,0.24125425149233592,1,0.6233016923476843,201.45236945601616,203.21111520452382,1.758745748507664
+leaf_percent_n,Does the selected linear response differ by legacy?,common_linear,linear_by_legacy,0.12568845402711304,1,0.7229449662647215,201.45236945601616,203.32668100198904,1.874311545972887

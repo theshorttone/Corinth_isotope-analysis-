@@ -1,0 +1,39 @@
+Linear mixed model fit by REML ['lmerMod']
+Formula: foliar_15n_enrichment ~ leaf_percent_n + mycorrhizal_legacy +  
+    (dist_c + dist_c2) * myc_type + (1 | site_unit) + (1 | species)
+   Data: data
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 684.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.1281 -0.6950 -0.1360  0.5415  2.9445 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.1653   0.4066  
+ species   (Intercept) 0.5647   0.7515  
+ Residual              2.6237   1.6198  
+Number of obs: 171, groups:  site_unit, 8; species, 7
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)           -5.021723   0.769477  -6.526
+leaf_percent_n         0.171382   0.302471   0.567
+mycorrhizal_legacyecm  1.826191   0.388064   4.706
+dist_c                 0.201428   0.042654   4.722
+dist_c2               -0.004833   0.010805  -0.447
+myc_typeecm            1.158283   0.676807   1.711
+dist_c:myc_typeecm    -0.208487   0.065226  -3.196
+dist_c2:myc_typeecm   -0.015728   0.014567  -1.080
+
+Correlation of Fixed Effects:
+            (Intr) lf_pr_ mycrr_ dist_c dst_c2 myc_ty dst_:_
+lef_prcnt_n -0.751                                          
+mycrrhzl_lg -0.318  0.105                                   
+dist_c       0.131 -0.100 -0.126                            
+dist_c2     -0.298  0.081  0.024 -0.168                     
+myc_typeecm -0.276 -0.155 -0.004 -0.019  0.252              
+dst_c:myc_t  0.031 -0.088  0.051 -0.630  0.105  0.052       
+dst_c2:myc_  0.216 -0.036 -0.081  0.135 -0.740 -0.336 -0.102

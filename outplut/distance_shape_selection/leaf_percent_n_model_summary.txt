@@ -1,0 +1,30 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 197.5
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.67024 -0.63295 -0.01335  0.50739  2.79914 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.02145  0.1465  
+ species   (Intercept) 0.13085  0.3617  
+ condition (Intercept) 0.16043  0.4005  
+ Residual              0.14469  0.3804  
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+             Estimate Std. Error        df t value Pr(>|t|)  
+(Intercept) 2.206e+00  3.251e-01 1.542e+00   6.785   0.0394 *
+dist_c      1.789e-02  7.622e-03 1.616e+02   2.347   0.0202 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+       (Intr)
+dist_c -0.008

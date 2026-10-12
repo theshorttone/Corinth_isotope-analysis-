@@ -1,0 +1,8 @@
+"k'","edf","k-index","p-value","term","response"
+3,0.697979934451546,1.07304373432796,0.8025,"s(dist_c):groupAM_AM","height_change"
+3,1.03926687020438,1.07304373432796,0.8175,"s(dist_c):groupECM_AM","height_change"
+3,0.826118290100334,1.07304373432796,0.7975,"s(dist_c):groupAM_ECM","height_change"
+3,0.000159609774914386,1.07304373432796,0.795,"s(dist_c):groupECM_ECM","height_change"
+2,0.761846090660879,NA,NA,"s(condition)","height_change"
+8,3.99709083421743,NA,NA,"s(site_unit)","height_change"
+7,4.6590054094283,NA,NA,"s(species)","height_change"

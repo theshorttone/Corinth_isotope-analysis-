@@ -1,0 +1,40 @@
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's
+  method [lmerModLmerTest]
+Formula: leaf_percent_n ~ mycorrhizal_legacy + dist_c * myc_type + dist_c2 +  
+    (1 | condition) + (1 | site_unit) + (1 | species)
+   Data: leaf_n_dat
+Control: fit_control
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    202.6     234.0     -91.3     182.6       161 
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.76004 -0.61864  0.00666  0.49312  3.02751 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ site_unit (Intercept) 0.01506  0.1227  
+ species   (Intercept) 0.08753  0.2959  
+ condition (Intercept) 0.08985  0.2998  
+ Residual              0.14157  0.3763  
+Number of obs: 171, groups:  site_unit, 8; species, 7; condition, 2
+
+Fixed effects:
+                        Estimate Std. Error         df t value Pr(>|t|)   
+(Intercept)             2.157196   0.277851   4.288380   7.764  0.00111 **
+mycorrhizal_legacyecm  -0.143954   0.105338   6.834672  -1.367  0.21501   
+dist_c                  0.016533   0.009811 157.361774   1.685  0.09393 . 
+myc_typeecm             0.356845   0.233551   6.122361   1.528  0.17642   
+dist_c2                -0.002431   0.001694 161.232266  -1.435  0.15310   
+dist_c:myc_typeecm      0.008392   0.015291 162.809887   0.549  0.58389   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) mycrr_ dist_c myc_ty dst_c2
+mycrrhzl_lg -0.186                            
+dist_c       0.037 -0.094                     
+myc_typeecm -0.365 -0.008  0.006              
+dist_c2     -0.107 -0.052 -0.100  0.014       
+dst_c:myc_t -0.044  0.049 -0.637  0.004  0.063

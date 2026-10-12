@@ -1,0 +1,4 @@
+"response","comparison","deviance_difference","df_difference","p_value"
+"height_change","linear_vs_quadratic",5.15499794809853,3.96779312278204,0.349154776379868
+"foliar_15n_enrichment","linear_vs_quadratic",9.72835867834249,4.70019301733952,0.104645647866264
+"leaf_percent_n","linear_vs_quadratic",6.7073831602226,3.92795448865199,0.19598335220711
